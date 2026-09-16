@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.TradeLog" parent="android:Theme.DeviceDefault.NoActionBar" />
+</resources>
