@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -12,14 +13,22 @@ android {
         applicationId = "com.tradelog.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            // Store credentials in keystore.properties (not committed to git)
+            // keytoreFile, storePassword, keyAlias, keyPassword loaded at build time
+            // Reference: Google LLC, "Sign your app" Android Developers (2024)
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -29,6 +38,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        // Enable desugaring for java.time APIs on older Android versions
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         compose = true
@@ -36,6 +47,7 @@ android {
 }
 
 dependencies {
+    // Core AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -54,17 +66,32 @@ dependencies {
     // Async — Kotlin Coroutines (JetBrains)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.gson)
-    // Local settings persistence — Android Jetpack DataStore
+    // Settings persistence — DataStore (Google LLC, 2024)
     implementation(libs.datastore.preferences)
-    // Firebase Authentication + Google Sign-In (Google LLC, 2024)
+    // Firebase — Auth, Firestore, Storage, Messaging (Google LLC, 2024)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.messaging)
     implementation(libs.play.services.auth)
-    // Credential Manager for modern Google Sign-In flow
+    // Google Sign-In — Credential Manager (Google LLC, 2024)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play)
     implementation(libs.googleid)
     implementation(libs.kotlinx.coroutines.play.services)
+    // Room — offline-first local database with KSP code generation (Google LLC, 2024)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    // WorkManager — background data synchronisation (Google LLC, 2024)
+    implementation(libs.androidx.work.runtime)
+    // Biometric — fingerprint / face authentication (Google LLC, 2024)
+    implementation(libs.androidx.biometric)
+    // Coil — async image loading for trade screenshots (Coil Contributors, 2024)
+    implementation(libs.coil.compose)
+    // Desugaring — java.time support on API < 26
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
