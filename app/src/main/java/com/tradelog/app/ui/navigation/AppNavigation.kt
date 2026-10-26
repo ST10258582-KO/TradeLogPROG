@@ -26,6 +26,7 @@ import com.tradelog.app.ui.screens.auth.LoginScreen
 import com.tradelog.app.ui.screens.auth.RegisterScreen
 import com.tradelog.app.ui.screens.dashboard.DashboardScreen
 import com.tradelog.app.ui.screens.journal.JournalScreen
+import com.tradelog.app.ui.screens.riskcalc.RiskCalculatorScreen
 import com.tradelog.app.ui.screens.settings.SettingsScreen
 import com.tradelog.app.ui.screens.splash.SplashScreen
 import com.tradelog.app.ui.screens.trades.TradeDetailScreen
@@ -174,8 +175,12 @@ fun AppNavigation() {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
                         }
-                    }
+                    },
+                    onNavigateToRiskCalc = { navController.navigate(Screen.RiskCalculator.route) }
                 )
+            }
+            composable(Screen.RiskCalculator.route) {
+                RiskCalculatorScreen(onBack = { navController.popBackStack() })
             }
         }
     }
