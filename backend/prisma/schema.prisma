@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id
+  email       String   @unique
+  displayName String
+  timezone    String   @default("Africa/Johannesburg")
+  defaultRisk Float    @default(1.0)
+  currency    String   @default("USD")
+  language    String   @default("en")
+  notifications Boolean @default(true)
+  createdAt   DateTime @default(now())
+  trades      Trade[]
+  tags        Tag[]
+}
+
+model Trade {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  instrument  String
+  direction   String
+  entryPrice  Float
+  stopLoss    Float
+  takeProfit  Float
+  exitPrice   Float?
+  quantity    Float
+  rMultiple   Float?
+  pnl         Float?
+  session     String?
+  status      String    @default("OPEN")
+  notes       String?
+  entryTime   DateTime
+  exitTime    DateTime?
+  tags        String    @default("")
+  createdAt   DateTime  @default(now())
+  syncedAt    DateTime?
+}
+
+model Tag {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name   String
+
+  @@unique([userId, name])
+}
