@@ -1,0 +1,98 @@
+<resources>
+    <string name="app_name">TradeLog</string>
+
+    <!-- Auth screens — Afrikaans translations -->
+    <string name="welcome_back">Welkom Terug</string>
+    <string name="sign_in_subtitle">Meld aan om jou handelsdagboek te gebruik</string>
+    <string name="sign_in_google">Meld aan met Google</string>
+    <string name="no_account">Het jy nie \'n rekening nie? Registreer</string>
+    <string name="biometric_sign_in">Gebruik Vingerafdruk / Gesig-ID</string>
+    <string name="biometric_title">Bevestig jou identiteit</string>
+    <string name="biometric_subtitle">Gebruik jou vingerafdruk of gesig om TradeLog te gebruik</string>
+    <string name="register_title">Skep Rekening</string>
+    <string name="register_subtitle">Stel jou handelsprofiel op</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Paneelbord</string>
+    <string name="net_pnl">Netto W&amp;V</string>
+    <string name="win_rate">Wenkoers</string>
+    <string name="avg_r">Gem R</string>
+    <string name="total_trades">Totale Handelstransaksies</string>
+    <string name="equity_curve">Ekwiteitslyn</string>
+    <string name="recent_trades">Onlangse Transaksies</string>
+
+    <!-- Trades -->
+    <string name="trades_title">Transaksies</string>
+    <string name="add_trade">Voeg Transaksie By</string>
+    <string name="instrument">Instrument</string>
+    <string name="direction">Rigting</string>
+    <string name="entry_price">Inkomsprys</string>
+    <string name="stop_loss">Stopverlies</string>
+    <string name="take_profit">Neem Wins</string>
+    <string name="quantity">Hoeveelheid</string>
+    <string name="notes">Notas</string>
+    <string name="save_trade">Stoor Transaksie</string>
+    <string name="trade_detail">Transaksiebesonderhede</string>
+    <string name="screenshot">Grafiek-skermkiekie</string>
+    <string name="upload_screenshot">Laai Skermkiekie Op</string>
+    <string name="no_screenshot">Geen skermkiekie aangeheg nie</string>
+
+    <!-- Analytics -->
+    <string name="analytics_title">Ontleding</string>
+    <string name="session_breakdown">Sessie-uiteensetting</string>
+    <string name="london_session">Londen</string>
+    <string name="new_york_session">New York</string>
+    <string name="asia_session">Asië</string>
+
+    <!-- Journal -->
+    <string name="journal_title">Dagboek</string>
+    <string name="premarket_notes">Voor-mark Notas</string>
+    <string name="postmarket_notes">Na-mark Notas</string>
+    <string name="mood_label">Vandag se Stemming</string>
+    <string name="rules_followed">Ek het vandag my handelsreëls gevolg</string>
+    <string name="save_entry">Stoor Inskrywing</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Instellings</string>
+    <string name="display_name">Vertoonnaam</string>
+    <string name="timezone">Tydsone</string>
+    <string name="default_risk">Verstekrisiko %</string>
+    <string name="currency">Geldeenheid</string>
+    <string name="language_label">Taal</string>
+    <string name="notifications_label">Kennisgewings</string>
+    <string name="biometric_lock">Biometriese Slot</string>
+    <string name="biometric_lock_desc">Vereis vingerafdruk of gesig-ID by begin</string>
+    <string name="save_changes">Stoor Veranderinge</string>
+    <string name="saved">Gestoor</string>
+    <string name="sign_out">Teken Uit</string>
+
+    <!-- Risk Calculator -->
+    <string name="risk_calc_title">Risikobereker</string>
+    <string name="account_balance">Rekeningsaldo ($)</string>
+    <string name="risk_percent">Risikopersentasie (%)</string>
+    <string name="stop_pips">Stopverlies (pippe/punte)</string>
+    <string name="pip_value">Pip / Puntwaarde ($)</string>
+    <string name="calculate">Bereken</string>
+    <string name="position_size">Posisiegrootte</string>
+    <string name="dollar_risk">Dollar Risiko</string>
+    <string name="risk_to_reward">Risiko : Beloning</string>
+
+    <!-- Offline -->
+    <string name="offline_mode">Aflyn Modus</string>
+    <string name="syncing">Sinkroniseer&#8230;</string>
+    <string name="sync_complete">Alle veranderinge gesinkroniseer</string>
+    <string name="offline_banner">Jy is aflyn — veranderinge word gesinkroniseer wanneer jy weer verbind</string>
+
+    <!-- General -->
+    <string name="loading">Laai tans&#8230;</string>
+    <string name="error_generic">Iets het verkeerd gegaan. Probeer asseblief weer.</string>
+    <string name="cancel">Kanselleer</string>
+    <string name="confirm">Bevestig</string>
+    <string name="delete">Skrap</string>
+    <string name="edit">Redigeer</string>
+    <string name="back">Terug</string>
+    <string name="open_status">Oop</string>
+    <string name="closed_status">Gesluit</string>
+    <string name="buy_direction">Koop</string>
+    <string name="sell_direction">Verkoop</string>
+</resources>
