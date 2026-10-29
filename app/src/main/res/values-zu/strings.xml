@@ -1,0 +1,98 @@
+<resources>
+    <string name="app_name">TradeLog</string>
+
+    <!-- Auth screens — Zulu translations -->
+    <string name="welcome_back">Wamukelekile Futhi</string>
+    <string name="sign_in_subtitle">Ngena ukuze usebenzise idayari yakho yezohwebo</string>
+    <string name="sign_in_google">Ngena nge-Google</string>
+    <string name="no_account">Awunayo i-akhawunti? Bhalisa</string>
+    <string name="biometric_sign_in">Sebenzisa Izigxivizo / ID Yobuso</string>
+    <string name="biometric_title">Qinisekisa ubuwena bakho</string>
+    <string name="biometric_subtitle">Sebenzisa izigxivizo zakho noma ubuso ukuze ufinyelele ku-TradeLog</string>
+    <string name="register_title">Dala I-akhawunti</string>
+    <string name="register_subtitle">Misa iphrofayili yakho yokuhweba</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Ibhodi Lokuphepha</string>
+    <string name="net_pnl">I-P&amp;L Ehlanzekile</string>
+    <string name="win_rate">Izinga Lokuwina</string>
+    <string name="avg_r">I-R Everage</string>
+    <string name="total_trades">Izohwebo Eziphelele</string>
+    <string name="equity_curve">Umkhondo we-Equity</string>
+    <string name="recent_trades">Izohwebo Zakamuva</string>
+
+    <!-- Trades -->
+    <string name="trades_title">Izohwebo</string>
+    <string name="add_trade">Engeza Uhwebo</string>
+    <string name="instrument">Ithuluzi</string>
+    <string name="direction">Ukhomba</string>
+    <string name="entry_price">Intengo Yokungena</string>
+    <string name="stop_loss">Imali Yokumisa Ukulahleka</string>
+    <string name="take_profit">Thatha Inzuzo</string>
+    <string name="quantity">Inani</string>
+    <string name="notes">Amanothi</string>
+    <string name="save_trade">Gcina Uhwebo</string>
+    <string name="trade_detail">Imininingwane Yohwebo</string>
+    <string name="screenshot">Isithombe Segrafu</string>
+    <string name="upload_screenshot">Layisha Isithombe</string>
+    <string name="no_screenshot">Ayikho isithombe esinamathiselwe</string>
+
+    <!-- Analytics -->
+    <string name="analytics_title">Ucwaningo</string>
+    <string name="session_breakdown">Ukwahlukana Kweseshini</string>
+    <string name="london_session">ILondon</string>
+    <string name="new_york_session">INew York</string>
+    <string name="asia_session">I-Eshiya</string>
+
+    <!-- Journal -->
+    <string name="journal_title">Idayari</string>
+    <string name="premarket_notes">Amanothi Ngaphambi Kwemakethe</string>
+    <string name="postmarket_notes">Amanothi Ngemva Kwemakethe</string>
+    <string name="mood_label">Imvakatho Yanamuhla</string>
+    <string name="rules_followed">Ngalandela imithetho yami yokuhweba namuhla</string>
+    <string name="save_entry">Gcina Ukufakwa</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Izilungiselelo</string>
+    <string name="display_name">Igama Lokubonisa</string>
+    <string name="timezone">Isikhathi Sendawo</string>
+    <string name="default_risk">Ingozi Evamile %</string>
+    <string name="currency">Imali</string>
+    <string name="language_label">Ulimi</string>
+    <string name="notifications_label">Izaziso</string>
+    <string name="biometric_lock">Ukuvinjelwa Kwe-Biometric</string>
+    <string name="biometric_lock_desc">Dinga izigxivizo noma i-ID yobuso uma uqalisa</string>
+    <string name="save_changes">Gcina Izinguquko</string>
+    <string name="saved">Kugcinwe</string>
+    <string name="sign_out">Phuma</string>
+
+    <!-- Risk Calculator -->
+    <string name="risk_calc_title">Isibali Sengozi</string>
+    <string name="account_balance">Ibhalansi Ye-akhawunti ($)</string>
+    <string name="risk_percent">Amaphesenti Engozi (%)</string>
+    <string name="stop_pips">Imali Yokumisa (amapiphi/amaphuzu)</string>
+    <string name="pip_value">Inani Lepiphi ($)</string>
+    <string name="calculate">Bala</string>
+    <string name="position_size">Usayizi Wesikhundla</string>
+    <string name="dollar_risk">Ingozi Yedola</string>
+    <string name="risk_to_reward">Ingozi : Umvuzo</string>
+
+    <!-- Offline -->
+    <string name="offline_mode">Imodi Yokungaxhunyiwe</string>
+    <string name="syncing">Iyahambelana&#8230;</string>
+    <string name="sync_complete">Izinguquko zonke zihambelelene</string>
+    <string name="offline_banner">Awuxhunyiwe — izinguquko zizohambelana lapho uxhunywe futhi</string>
+
+    <!-- General -->
+    <string name="loading">Iyalayisha&#8230;</string>
+    <string name="error_generic">Kukhona okungahambanga kahle. Sicela uzame futhi.</string>
+    <string name="cancel">Khansela</string>
+    <string name="confirm">Qinisekisa</string>
+    <string name="delete">Susa</string>
+    <string name="edit">Hlela</string>
+    <string name="back">Emuva</string>
+    <string name="open_status">Kuvuliwe</string>
+    <string name="closed_status">Kuvaliwe</string>
+    <string name="buy_direction">Thenga</string>
+    <string name="sell_direction">Thengisa</string>
+</resources>
