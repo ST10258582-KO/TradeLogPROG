@@ -1,0 +1,98 @@
+<resources>
+    <string name="app_name">TradeLog</string>
+
+    <!-- Auth screens -->
+    <string name="welcome_back">Welcome Back</string>
+    <string name="sign_in_subtitle">Sign in to access your trading journal</string>
+    <string name="sign_in_google">Sign In with Google</string>
+    <string name="no_account">Don\'t have an account? Register</string>
+    <string name="biometric_sign_in">Use Fingerprint / Face ID</string>
+    <string name="biometric_title">Verify your identity</string>
+    <string name="biometric_subtitle">Use your fingerprint or face to access TradeLog</string>
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Set up your trading profile</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="net_pnl">Net P&amp;L</string>
+    <string name="win_rate">Win Rate</string>
+    <string name="avg_r">Avg R</string>
+    <string name="total_trades">Total Trades</string>
+    <string name="equity_curve">Equity Curve</string>
+    <string name="recent_trades">Recent Trades</string>
+
+    <!-- Trades -->
+    <string name="trades_title">Trades</string>
+    <string name="add_trade">Add Trade</string>
+    <string name="instrument">Instrument</string>
+    <string name="direction">Direction</string>
+    <string name="entry_price">Entry Price</string>
+    <string name="stop_loss">Stop Loss</string>
+    <string name="take_profit">Take Profit</string>
+    <string name="quantity">Quantity</string>
+    <string name="notes">Notes</string>
+    <string name="save_trade">Save Trade</string>
+    <string name="trade_detail">Trade Detail</string>
+    <string name="screenshot">Chart Screenshot</string>
+    <string name="upload_screenshot">Upload Screenshot</string>
+    <string name="no_screenshot">No screenshot attached</string>
+
+    <!-- Analytics -->
+    <string name="analytics_title">Analytics</string>
+    <string name="session_breakdown">Session Breakdown</string>
+    <string name="london_session">London</string>
+    <string name="new_york_session">New York</string>
+    <string name="asia_session">Asia</string>
+
+    <!-- Journal -->
+    <string name="journal_title">Journal</string>
+    <string name="premarket_notes">Pre-market Notes</string>
+    <string name="postmarket_notes">Post-market Notes</string>
+    <string name="mood_label">Today\'s Mood</string>
+    <string name="rules_followed">I followed my trading rules today</string>
+    <string name="save_entry">Save Entry</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="display_name">Display Name</string>
+    <string name="timezone">Timezone</string>
+    <string name="default_risk">Default Risk %</string>
+    <string name="currency">Currency</string>
+    <string name="language_label">Language</string>
+    <string name="notifications_label">Notifications</string>
+    <string name="biometric_lock">Biometric Lock</string>
+    <string name="biometric_lock_desc">Require fingerprint or face ID on launch</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="saved">Saved</string>
+    <string name="sign_out">Sign Out</string>
+
+    <!-- Risk Calculator (User Defined Feature) -->
+    <string name="risk_calc_title">Risk Calculator</string>
+    <string name="account_balance">Account Balance ($)</string>
+    <string name="risk_percent">Risk Percentage (%)</string>
+    <string name="stop_pips">Stop Loss (pips/points)</string>
+    <string name="pip_value">Pip / Point Value ($)</string>
+    <string name="calculate">Calculate</string>
+    <string name="position_size">Position Size</string>
+    <string name="dollar_risk">Dollar Risk</string>
+    <string name="risk_to_reward">Risk : Reward</string>
+
+    <!-- Offline / Sync -->
+    <string name="offline_mode">Offline Mode</string>
+    <string name="syncing">Syncing&#8230;</string>
+    <string name="sync_complete">All changes synced</string>
+    <string name="offline_banner">You are offline — changes will sync when reconnected</string>
+
+    <!-- General -->
+    <string name="loading">Loading&#8230;</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="back">Back</string>
+    <string name="open_status">Open</string>
+    <string name="closed_status">Closed</string>
+    <string name="buy_direction">Buy</string>
+    <string name="sell_direction">Sell</string>
+</resources>
