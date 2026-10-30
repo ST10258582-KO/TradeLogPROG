@@ -16,8 +16,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.tradelog.app.R
 import com.tradelog.app.data.model.Trade
 import com.tradelog.app.data.model.TradeDirection
 import com.tradelog.app.data.remote.AnalyticsSummary
@@ -39,12 +42,18 @@ fun DashboardScreen(
     val summary by tradeViewModel.summary.collectAsState()
     val equityCurve by tradeViewModel.equityCurve.collectAsState()
     val isLoading by tradeViewModel.isLoading.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         Log.d(TAG, "DashboardScreen launched")
         tradeViewModel.loadDashboard()
         tradeViewModel.loadTrades()
     }
+
+    // Offline mode banner — shown when device has no network connectivity
+    val connectivityManager = context.getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+    @Suppress("DEPRECATION")
+    val isOnline = connectivityManager.activeNetworkInfo?.isConnectedOrConnecting == true
 
     LazyColumn(
         modifier = Modifier
@@ -54,6 +63,22 @@ fun DashboardScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
+        if (!isOnline) {
+            item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color(0xFFE65100),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        stringResource(R.string.offline_banner),
+                        modifier = Modifier.padding(12.dp),
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        }
         item {
             Text("TradeLog", style = MaterialTheme.typography.headlineMedium, color = Color.White)
         }
