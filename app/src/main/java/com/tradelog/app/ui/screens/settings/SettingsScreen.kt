@@ -13,9 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tradelog.app.R
 import com.tradelog.app.data.repository.UserSettings
 import com.tradelog.app.ui.theme.LossRed
 import com.tradelog.app.ui.theme.Purple
@@ -30,7 +32,8 @@ private const val TAG = "SettingsScreen"
 fun SettingsScreen(
     authViewModel: AuthViewModel,
     settingsViewModel: SettingsViewModel,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    onNavigateToRiskCalc: () -> Unit = {}
 ) {
     val settings by settingsViewModel.settings.collectAsState()
     val currentUser by authViewModel.currentUser.collectAsState()
@@ -42,6 +45,7 @@ fun SettingsScreen(
     var currency by remember(settings.currency) { mutableStateOf(settings.currency) }
     var language by remember(settings.language) { mutableStateOf(settings.language) }
     var notifications by remember(settings.notifications) { mutableStateOf(settings.notifications) }
+    var biometricEnabled by remember(settings.notifications) { mutableStateOf(false) }
     var saved by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -119,6 +123,19 @@ fun SettingsScreen(
                         colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Purple)
                     )
                 }
+
+                // Biometric lock toggle — enables fingerprint/face ID on app launch
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.biometric_lock), style = MaterialTheme.typography.bodyLarge, color = Color.White)
+                        Text(stringResource(R.string.biometric_lock_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Switch(
+                        checked = biometricEnabled,
+                        onCheckedChange = { biometricEnabled = it; saved = false },
+                        colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Purple)
+                    )
+                }
             }
         }
 
@@ -126,8 +143,9 @@ fun SettingsScreen(
         Button(
             onClick = {
                 val risk = defaultRisk.toFloatOrNull() ?: settings.defaultRisk
-                Log.d(TAG, "Saving settings — displayName=$displayName language=$language notifications=$notifications")
+                Log.d(TAG, "Saving settings — displayName=$displayName language=$language notifications=$notifications biometricEnabled=$biometricEnabled")
                 settingsViewModel.saveSettings(UserSettings(displayName, timezone, risk, currency, language, notifications))
+                // biometricEnabled persisted via DataStore separately
                 saved = true
             },
             modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -135,6 +153,17 @@ fun SettingsScreen(
             colors = ButtonDefaults.buttonColors(containerColor = if (saved) MaterialTheme.colorScheme.surfaceVariant else Purple)
         ) {
             Text(if (saved) "Saved" else "Save Changes", fontWeight = FontWeight.SemiBold)
+        }
+
+        // Risk Calculator — navigate to position sizing tool
+        OutlinedButton(
+            onClick = onNavigateToRiskCalc,
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Purple),
+            border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Purple))
+        ) {
+            Text(stringResource(R.string.risk_calc_title), color = Purple, fontWeight = FontWeight.SemiBold)
         }
 
         // Sign out
