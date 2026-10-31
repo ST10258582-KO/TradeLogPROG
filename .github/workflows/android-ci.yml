@@ -25,6 +25,32 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Create dummy google-services.json for CI build
+        run: |
+          cat > app/google-services.json << 'EOF'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "tradelog-ci",
+              "storage_bucket": "tradelog-ci.appspot.com"
+            },
+            "client": [{
+              "client_info": {
+                "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                "android_client_info": { "package_name": "com.tradelog.app" }
+              },
+              "oauth_client": [{"client_id": "000000000000-ci.apps.googleusercontent.com","client_type": 3}],
+              "api_key": [{"current_key": "AIzaCI000000000000000000000000000000000"}],
+              "services": {
+                "appinvite_service": {"other_platform_oauth_client": [{"client_id": "000000000000-ci.apps.googleusercontent.com","client_type": 3}]}
+              }
+            }],
+            "configuration_version": "1"
+          }
+          EOF
+        # This CI-only dummy file allows the build to complete without real Firebase credentials.
+        # The actual google-services.json is excluded from git for security.
+
       - name: Run unit tests
         run: ./gradlew test --stacktrace
 
