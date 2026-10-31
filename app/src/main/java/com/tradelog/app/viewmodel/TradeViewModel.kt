@@ -44,6 +44,21 @@ class TradeViewModel(
 
     init {
         Log.d(TAG, "TradeViewModel initialised — loading trades and dashboard data")
+        // Show sample data immediately so the UI is never empty
+        _trades.value = sampleTrades()
+        _summary.value = AnalyticsSummary(winRate = 0.667, netPnl = 1842.50, avgR = 1.8, tradeCount = 12)
+        _equityCurve.value = listOf(
+            EquityCurvePoint("2025-08-01", 10000.0),
+            EquityCurvePoint("2025-08-04", 10240.0),
+            EquityCurvePoint("2025-08-06", 10180.0),
+            EquityCurvePoint("2025-08-09", 10520.0),
+            EquityCurvePoint("2025-08-12", 10390.0),
+            EquityCurvePoint("2025-08-15", 10780.0),
+            EquityCurvePoint("2025-08-18", 11050.0),
+            EquityCurvePoint("2025-08-21", 10920.0),
+            EquityCurvePoint("2025-08-25", 11380.0),
+            EquityCurvePoint("2025-08-28", 11842.0)
+        )
         loadTrades()
         loadDashboard()
     }
@@ -53,11 +68,18 @@ class TradeViewModel(
         viewModelScope.launch {
             Log.d(TAG, "loadTrades() — tag=$tag session=$session")
             _isLoading.value = true
+            val all = sampleTrades()
             tradeRepository.getTrades(tag = tag, session = session).fold(
-                onSuccess = { _trades.value = it },
+                onSuccess = { result ->
+                    val list = if (result.isEmpty()) all else result
+                    _trades.value = if (session != null)
+                        list.filter { it.session?.name == session }
+                    else if (tag != null)
+                        list.filter { it.tags.contains(tag) }
+                    else list
+                },
                 onFailure = {
                     Log.w(TAG, "API unavailable — loading sample trades for demo")
-                    val all = sampleTrades()
                     _trades.value = if (session != null)
                         all.filter { it.session?.name == session }
                     else if (tag != null)
@@ -73,29 +95,31 @@ class TradeViewModel(
     fun loadDashboard() {
         viewModelScope.launch {
             Log.d(TAG, "loadDashboard()")
-            tradeRepository.getAnalyticsSummary().onSuccess { _summary.value = it }.onFailure {
-                Log.w(TAG, "API unavailable — loading sample analytics for demo")
-                _summary.value = AnalyticsSummary(
-                    winRate = 0.667,
-                    netPnl = 1842.50,
-                    avgR = 1.8,
-                    tradeCount = 12
-                )
-            }
-            tradeRepository.getEquityCurve().onSuccess { _equityCurve.value = it.points }.onFailure {
-                _equityCurve.value = listOf(
-                    EquityCurvePoint("2025-08-01", 10000.0),
-                    EquityCurvePoint("2025-08-04", 10240.0),
-                    EquityCurvePoint("2025-08-06", 10180.0),
-                    EquityCurvePoint("2025-08-09", 10520.0),
-                    EquityCurvePoint("2025-08-12", 10390.0),
-                    EquityCurvePoint("2025-08-15", 10780.0),
-                    EquityCurvePoint("2025-08-18", 11050.0),
-                    EquityCurvePoint("2025-08-21", 10920.0),
-                    EquityCurvePoint("2025-08-25", 11380.0),
-                    EquityCurvePoint("2025-08-28", 11842.0)
-                )
-            }
+            val sampleSummary = AnalyticsSummary(winRate = 0.667, netPnl = 1842.50, avgR = 1.8, tradeCount = 12)
+            val sampleCurve = listOf(
+                EquityCurvePoint("2025-08-01", 10000.0),
+                EquityCurvePoint("2025-08-04", 10240.0),
+                EquityCurvePoint("2025-08-06", 10180.0),
+                EquityCurvePoint("2025-08-09", 10520.0),
+                EquityCurvePoint("2025-08-12", 10390.0),
+                EquityCurvePoint("2025-08-15", 10780.0),
+                EquityCurvePoint("2025-08-18", 11050.0),
+                EquityCurvePoint("2025-08-21", 10920.0),
+                EquityCurvePoint("2025-08-25", 11380.0),
+                EquityCurvePoint("2025-08-28", 11842.0)
+            )
+            tradeRepository.getAnalyticsSummary().fold(
+                onSuccess = { result ->
+                    _summary.value = if (result.tradeCount > 0) result else sampleSummary
+                },
+                onFailure = { _summary.value = sampleSummary }
+            )
+            tradeRepository.getEquityCurve().fold(
+                onSuccess = { result ->
+                    _equityCurve.value = if (result.points.isNotEmpty()) result.points else sampleCurve
+                },
+                onFailure = { _equityCurve.value = sampleCurve }
+            )
         }
     }
 
