@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Backend
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/firebase-service-account.json
+backend/prisma/tradelog.db
+backend/prisma/tradelog.db-journal
