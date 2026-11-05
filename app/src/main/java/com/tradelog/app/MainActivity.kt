@@ -2,9 +2,9 @@ package com.tradelog.app
 
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import com.tradelog.app.ui.navigation.AppNavigation
 import com.tradelog.app.ui.theme.TradeLogTheme
@@ -12,7 +12,7 @@ import com.tradelog.app.ui.theme.TradeLogTheme
 // Single Activity — hosts the entire Jetpack Compose UI.
 // All navigation is handled by the Jetpack Navigation Compose NavHost inside AppNavigation.
 // Reference: Google LLC, "Guide to App Architecture" Android Developers (2024)
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private val TAG = "MainActivity"
 

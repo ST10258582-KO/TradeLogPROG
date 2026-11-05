@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -47,7 +48,7 @@ class BiometricRepository {
      */
     fun canAuthenticate(context: Context): Boolean {
         val manager = BiometricManager.from(context)
-        val result = manager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+        val result = manager.canAuthenticate(BIOMETRIC_STRONG or BIOMETRIC_WEAK or DEVICE_CREDENTIAL)
         Log.d(TAG, "canAuthenticate() = $result")
         return result == BiometricManager.BIOMETRIC_SUCCESS
     }
@@ -99,7 +100,7 @@ class BiometricRepository {
             val promptInfo = BiometricPrompt.PromptInfo.Builder()
                 .setTitle("Verify your identity")
                 .setSubtitle("Use your fingerprint or face to access TradeLog")
-                .setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+                .setAllowedAuthenticators(BIOMETRIC_STRONG or BIOMETRIC_WEAK or DEVICE_CREDENTIAL)
                 .build()
 
             // Cancel the prompt if the coroutine is cancelled externally (e.g. screen rotation)

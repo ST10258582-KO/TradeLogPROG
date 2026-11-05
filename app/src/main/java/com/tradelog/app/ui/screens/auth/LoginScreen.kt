@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.activity.compose.LocalActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,7 +52,7 @@ fun LoginScreen(
     // Check if device supports biometrics — only show button if available
     val biometricAvailable = remember {
         BiometricManager.from(context)
-            .canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL) ==
+            .canAuthenticate(BIOMETRIC_STRONG or BIOMETRIC_WEAK or DEVICE_CREDENTIAL) ==
                 BiometricManager.BIOMETRIC_SUCCESS
     }
 
