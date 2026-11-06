@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.tradelog.app.R
 import com.tradelog.app.data.model.Trade
 import com.tradelog.app.data.model.TradeDirection
-import com.tradelog.app.data.remote.AnalyticsSummary
 import com.tradelog.app.data.remote.EquityCurvePoint
 import com.tradelog.app.ui.theme.LossRed
 import com.tradelog.app.ui.theme.NeonGreen
@@ -39,15 +38,28 @@ fun DashboardScreen(
     onTradeClick: (String) -> Unit
 ) {
     val trades by tradeViewModel.trades.collectAsState()
-    val summary by tradeViewModel.summary.collectAsState()
-    val equityCurve by tradeViewModel.equityCurve.collectAsState()
     val isLoading by tradeViewModel.isLoading.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         Log.d(TAG, "DashboardScreen launched")
-        tradeViewModel.loadDashboard()
         tradeViewModel.loadTrades()
+    }
+
+    // Compute stats live from real trades
+    val closed = trades.filter { it.pnl != null }
+    val wins = closed.count { (it.pnl ?: 0.0) > 0 }
+    val winRate = if (closed.isEmpty()) null else wins.toDouble() / closed.size
+    val netPnl = if (closed.isEmpty()) null else closed.sumOf { it.pnl ?: 0.0 }
+    val avgR = closed.mapNotNull { it.rMultiple }.let { rs -> if (rs.isEmpty()) null else rs.average() }
+
+    // Build equity curve: cumulative P&L sorted by entry time
+    val equityCurve = run {
+        var cumulative = 0.0
+        closed.sortedBy { it.entryTime }.map { t ->
+            cumulative += t.pnl ?: 0.0
+            EquityCurvePoint(t.entryTime.take(10), cumulative)
+        }
     }
 
     // Offline mode banner — shown when device has no network connectivity
@@ -82,7 +94,7 @@ fun DashboardScreen(
         item {
             Text("TradeLog", style = MaterialTheme.typography.headlineMedium, color = Color.White)
         }
-        item { SummaryRow(summary = summary) }
+        item { SummaryRow(winRate = winRate, netPnl = netPnl, avgR = avgR) }
         item { EquityCurveCard(points = equityCurve) }
         item {
             Text(
@@ -114,20 +126,20 @@ fun DashboardScreen(
 }
 
 @Composable
-private fun SummaryRow(summary: AnalyticsSummary?) {
+private fun SummaryRow(winRate: Double?, netPnl: Double?, avgR: Double?) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        StatCard("WIN RATE", summary?.let { "${(it.winRate * 100).toInt()}%" } ?: "--", modifier = Modifier.weight(1f))
+        StatCard("WIN RATE", winRate?.let { "${(it * 100).toInt()}%" } ?: "--", modifier = Modifier.weight(1f))
         StatCard(
             "NET P&L",
-            summary?.let { formatPnl(it.netPnl) } ?: "--",
+            netPnl?.let { formatPnl(it) } ?: "--",
             valueColor = when {
-                summary == null -> Color.White
-                summary.netPnl >= 0 -> NeonGreen
+                netPnl == null -> Color.White
+                netPnl >= 0 -> NeonGreen
                 else -> LossRed
             },
             modifier = Modifier.weight(1f)
         )
-        StatCard("AVG R", summary?.let { String.format("%.2fR", it.avgR) } ?: "--", modifier = Modifier.weight(1f))
+        StatCard("AVG R", avgR?.let { String.format("%.2fR", it) } ?: "--", modifier = Modifier.weight(1f))
     }
 }
 

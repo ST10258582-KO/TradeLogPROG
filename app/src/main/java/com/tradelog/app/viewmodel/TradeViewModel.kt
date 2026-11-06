@@ -39,28 +39,15 @@ class TradeViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _isDetailLoading = MutableStateFlow(false)
+    val isDetailLoading: StateFlow<Boolean> = _isDetailLoading.asStateFlow()
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     init {
-        Log.d(TAG, "TradeViewModel initialised — loading trades and dashboard data")
-        // Show sample data immediately so the UI is never empty
-        _trades.value = sampleTrades()
-        _summary.value = AnalyticsSummary(winRate = 0.667, netPnl = 1842.50, avgR = 1.8, tradeCount = 12)
-        _equityCurve.value = listOf(
-            EquityCurvePoint("2025-08-01", 10000.0),
-            EquityCurvePoint("2025-08-04", 10240.0),
-            EquityCurvePoint("2025-08-06", 10180.0),
-            EquityCurvePoint("2025-08-09", 10520.0),
-            EquityCurvePoint("2025-08-12", 10390.0),
-            EquityCurvePoint("2025-08-15", 10780.0),
-            EquityCurvePoint("2025-08-18", 11050.0),
-            EquityCurvePoint("2025-08-21", 10920.0),
-            EquityCurvePoint("2025-08-25", 11380.0),
-            EquityCurvePoint("2025-08-28", 11842.0)
-        )
+        Log.d(TAG, "TradeViewModel initialised — loading trades")
         loadTrades()
-        loadDashboard()
     }
 
     // Load all trades with optional filters (FR-05)
@@ -68,134 +55,42 @@ class TradeViewModel(
         viewModelScope.launch {
             Log.d(TAG, "loadTrades() — tag=$tag session=$session")
             _isLoading.value = true
-            val all = sampleTrades()
             tradeRepository.getTrades(tag = tag, session = session).fold(
                 onSuccess = { result ->
-                    val list = if (result.isEmpty()) all else result
-                    _trades.value = if (session != null)
-                        list.filter { it.session?.name == session }
-                    else if (tag != null)
-                        list.filter { it.tags.contains(tag) }
-                    else list
+                    _trades.value = when {
+                        session != null -> result.filter { it.session?.name == session }
+                        tag != null -> result.filter { it.tags.contains(tag) }
+                        else -> result
+                    }
                 },
                 onFailure = {
-                    Log.w(TAG, "API unavailable — loading sample trades for demo")
-                    _trades.value = if (session != null)
-                        all.filter { it.session?.name == session }
-                    else if (tag != null)
-                        all.filter { it.tags.contains(tag) }
-                    else all
+                    Log.w(TAG, "loadTrades failed: ${it.message}")
+                    _trades.value = emptyList()
                 }
             )
             _isLoading.value = false
         }
     }
 
-    // Load dashboard summary and equity curve (FR-07)
+    // No-op kept so call sites in DashboardScreen compile — stats computed in UI from trades
     fun loadDashboard() {
-        viewModelScope.launch {
-            Log.d(TAG, "loadDashboard()")
-            val sampleSummary = AnalyticsSummary(winRate = 0.667, netPnl = 1842.50, avgR = 1.8, tradeCount = 12)
-            val sampleCurve = listOf(
-                EquityCurvePoint("2025-08-01", 10000.0),
-                EquityCurvePoint("2025-08-04", 10240.0),
-                EquityCurvePoint("2025-08-06", 10180.0),
-                EquityCurvePoint("2025-08-09", 10520.0),
-                EquityCurvePoint("2025-08-12", 10390.0),
-                EquityCurvePoint("2025-08-15", 10780.0),
-                EquityCurvePoint("2025-08-18", 11050.0),
-                EquityCurvePoint("2025-08-21", 10920.0),
-                EquityCurvePoint("2025-08-25", 11380.0),
-                EquityCurvePoint("2025-08-28", 11842.0)
-            )
-            tradeRepository.getAnalyticsSummary().fold(
-                onSuccess = { result ->
-                    _summary.value = if (result.tradeCount > 0) result else sampleSummary
-                },
-                onFailure = { _summary.value = sampleSummary }
-            )
-            tradeRepository.getEquityCurve().fold(
-                onSuccess = { result ->
-                    _equityCurve.value = if (result.points.isNotEmpty()) result.points else sampleCurve
-                },
-                onFailure = { _equityCurve.value = sampleCurve }
-            )
-        }
+        loadTrades()
     }
-
-    private fun sampleTrades() = listOf(
-        Trade(id="1", userId="demo", instrument="NAS100", direction=com.tradelog.app.data.model.TradeDirection.BUY,
-            entryPrice=18450.0, stopLoss=18320.0, takeProfit=18750.0, exitPrice=18740.0,
-            quantity=1.0, rMultiple=2.23, pnl=290.0, session=com.tradelog.app.data.model.TradingSession.LONDON,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("breakout","high-rr"),
-            entryTime="2025-08-28T09:15:00Z", exitTime="2025-08-28T11:42:00Z", createdAt="2025-08-28T09:15:00Z"),
-        Trade(id="2", userId="demo", instrument="US30", direction=com.tradelog.app.data.model.TradeDirection.SELL,
-            entryPrice=39200.0, stopLoss=39350.0, takeProfit=38900.0, exitPrice=38920.0,
-            quantity=1.0, rMultiple=1.87, pnl=280.0, session=com.tradelog.app.data.model.TradingSession.NEW_YORK,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("trend","reversal"),
-            entryTime="2025-08-27T14:30:00Z", exitTime="2025-08-27T16:10:00Z", createdAt="2025-08-27T14:30:00Z"),
-        Trade(id="3", userId="demo", instrument="EURUSD", direction=com.tradelog.app.data.model.TradeDirection.BUY,
-            entryPrice=1.0842, stopLoss=1.0810, takeProfit=1.0920, exitPrice=1.0798,
-            quantity=10000.0, rMultiple=-1.37, pnl=-180.0, session=com.tradelog.app.data.model.TradingSession.LONDON,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("news","fakeout"),
-            entryTime="2025-08-26T08:00:00Z", exitTime="2025-08-26T09:45:00Z", createdAt="2025-08-26T08:00:00Z"),
-        Trade(id="4", userId="demo", instrument="NAS100", direction=com.tradelog.app.data.model.TradeDirection.BUY,
-            entryPrice=18120.0, stopLoss=18020.0, takeProfit=18420.0, exitPrice=18415.0,
-            quantity=1.0, rMultiple=2.95, pnl=295.0, session=com.tradelog.app.data.model.TradingSession.NEW_YORK,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("breakout"),
-            entryTime="2025-08-25T13:00:00Z", exitTime="2025-08-25T15:30:00Z", createdAt="2025-08-25T13:00:00Z"),
-        Trade(id="5", userId="demo", instrument="GBPUSD", direction=com.tradelog.app.data.model.TradeDirection.SELL,
-            entryPrice=1.2680, stopLoss=1.2720, takeProfit=1.2580, exitPrice=1.2590,
-            quantity=10000.0, rMultiple=2.25, pnl=225.0, session=com.tradelog.app.data.model.TradingSession.LONDON,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("trend"),
-            entryTime="2025-08-22T09:30:00Z", exitTime="2025-08-22T11:00:00Z", createdAt="2025-08-22T09:30:00Z"),
-        Trade(id="6", userId="demo", instrument="US30", direction=com.tradelog.app.data.model.TradeDirection.BUY,
-            entryPrice=38750.0, stopLoss=38600.0, takeProfit=39100.0, exitPrice=38620.0,
-            quantity=1.0, rMultiple=-0.87, pnl=-130.0, session=com.tradelog.app.data.model.TradingSession.NEW_YORK,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("failed-breakout"),
-            entryTime="2025-08-21T14:00:00Z", exitTime="2025-08-21T15:20:00Z", createdAt="2025-08-21T14:00:00Z"),
-        Trade(id="7", userId="demo", instrument="NAS100", direction=com.tradelog.app.data.model.TradeDirection.SELL,
-            entryPrice=18620.0, stopLoss=18720.0, takeProfit=18320.0, exitPrice=18340.0,
-            quantity=1.0, rMultiple=2.80, pnl=280.0, session=com.tradelog.app.data.model.TradingSession.ASIA,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("reversal","high-rr"),
-            entryTime="2025-08-20T02:15:00Z", exitTime="2025-08-20T05:40:00Z", createdAt="2025-08-20T02:15:00Z"),
-        Trade(id="8", userId="demo", instrument="EURUSD", direction=com.tradelog.app.data.model.TradeDirection.SELL,
-            entryPrice=1.0910, stopLoss=1.0945, takeProfit=1.0805, exitPrice=1.0812,
-            quantity=10000.0, rMultiple=2.80, pnl=280.0, session=com.tradelog.app.data.model.TradingSession.LONDON,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("trend"),
-            entryTime="2025-08-19T08:45:00Z", exitTime="2025-08-19T12:30:00Z", createdAt="2025-08-19T08:45:00Z"),
-        Trade(id="9", userId="demo", instrument="NAS100", direction=com.tradelog.app.data.model.TradeDirection.BUY,
-            entryPrice=17980.0, stopLoss=17860.0, takeProfit=18340.0, exitPrice=17875.0,
-            quantity=1.0, rMultiple=-0.87, pnl=-105.0, session=com.tradelog.app.data.model.TradingSession.NEW_YORK,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("choppy"),
-            entryTime="2025-08-18T13:30:00Z", exitTime="2025-08-18T14:45:00Z", createdAt="2025-08-18T13:30:00Z"),
-        Trade(id="10", userId="demo", instrument="US30", direction=com.tradelog.app.data.model.TradeDirection.BUY,
-            entryPrice=38200.0, stopLoss=38080.0, takeProfit=38600.0, exitPrice=38590.0,
-            quantity=1.0, rMultiple=3.25, pnl=390.0, session=com.tradelog.app.data.model.TradingSession.LONDON,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("breakout","high-rr"),
-            entryTime="2025-08-15T09:00:00Z", exitTime="2025-08-15T12:15:00Z", createdAt="2025-08-15T09:00:00Z"),
-        Trade(id="11", userId="demo", instrument="GBPUSD", direction=com.tradelog.app.data.model.TradeDirection.BUY,
-            entryPrice=1.2540, stopLoss=1.2490, takeProfit=1.2690, exitPrice=1.2685,
-            quantity=10000.0, rMultiple=2.90, pnl=290.0, session=com.tradelog.app.data.model.TradingSession.LONDON,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("trend","breakout"),
-            entryTime="2025-08-12T08:30:00Z", exitTime="2025-08-12T11:00:00Z", createdAt="2025-08-12T08:30:00Z"),
-        Trade(id="12", userId="demo", instrument="NAS100", direction=com.tradelog.app.data.model.TradeDirection.BUY,
-            entryPrice=17650.0, stopLoss=17550.0, takeProfit=17950.0, exitPrice=17940.0,
-            quantity=1.0, rMultiple=2.90, pnl=290.0, session=com.tradelog.app.data.model.TradingSession.NEW_YORK,
-            status=com.tradelog.app.data.model.TradeStatus.CLOSED, tags=listOf("high-rr"),
-            entryTime="2025-08-09T14:00:00Z", exitTime="2025-08-09T16:30:00Z", createdAt="2025-08-09T14:00:00Z")
-    )
 
     // Load a single trade for the detail screen (FR-06)
     fun loadTrade(id: String) {
         viewModelScope.launch {
             Log.d(TAG, "loadTrade($id)")
-            _isLoading.value = true
+            _selectedTrade.value = null
+            _isDetailLoading.value = true
             tradeRepository.getTrade(id).fold(
                 onSuccess = { _selectedTrade.value = it },
-                onFailure = { _errorMessage.value = it.message }
+                onFailure = {
+                    Log.w(TAG, "loadTrade failed: ${it.message}")
+                    _errorMessage.value = it.message
+                }
             )
-            _isLoading.value = false
+            _isDetailLoading.value = false
         }
     }
 
