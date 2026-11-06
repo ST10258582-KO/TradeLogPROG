@@ -29,6 +29,23 @@ class JournalViewModel : ViewModel() {
         _entries.value = existing
     }
 
+    fun updateEntry(id: String, notes: String, checklistCompleted: Int, checklistTotal: Int) {
+        val existing = _entries.value.toMutableList()
+        val idx = existing.indexOfFirst { it.id == id }
+        if (idx >= 0) {
+            existing[idx] = existing[idx].copy(
+                notes = notes,
+                checklistCompleted = checklistCompleted,
+                checklistTotal = checklistTotal
+            )
+            _entries.value = existing
+        }
+    }
+
+    fun deleteEntry(id: String) {
+        _entries.value = _entries.value.filter { it.id != id }
+    }
+
     private fun sampleEntries() = listOf(
         JournalEntry(id="s1", date="2025-08-28", checklistCompleted=4, checklistTotal=4,
             notes="Strong London open. NAS100 broke above prior day high cleanly. Took the breakout — clean 2R. Market felt controlled all morning. Stayed patient and waited for confirmation before entry."),

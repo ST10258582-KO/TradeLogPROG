@@ -1,13 +1,14 @@
 package com.tradelog.app.ui.screens.journal
 
 import android.util.Log
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,11 +32,12 @@ private const val TAG = "JournalScreen"
 fun JournalScreen(journalViewModel: JournalViewModel = viewModel()) {
     val entries by journalViewModel.entries.collectAsState()
     var showNewEntry by remember { mutableStateOf(false) }
+    var editingEntry by remember { mutableStateOf<JournalEntry?>(null) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
-            if (!showNewEntry) {
+            if (!showNewEntry && editingEntry == null) {
                 FloatingActionButton(
                     onClick = { showNewEntry = true },
                     containerColor = Purple,
@@ -60,7 +62,9 @@ fun JournalScreen(journalViewModel: JournalViewModel = viewModel()) {
 
             if (showNewEntry) {
                 item {
-                    NewEntryCard(
+                    EntryCard(
+                        initialNotes = "",
+                        initialCompleted = 0,
                         onSave = { notes, completed, total ->
                             journalViewModel.saveEntry(notes, completed, total)
                             showNewEntry = false
@@ -71,21 +75,45 @@ fun JournalScreen(journalViewModel: JournalViewModel = viewModel()) {
                 }
             }
 
-            if (entries.isEmpty() && !showNewEntry) {
+            editingEntry?.let { editing ->
+                item {
+                    EntryCard(
+                        initialNotes = editing.notes,
+                        initialCompleted = editing.checklistCompleted,
+                        onSave = { notes, completed, total ->
+                            journalViewModel.updateEntry(editing.id, notes, completed, total)
+                            editingEntry = null
+                            Log.i(TAG, "Journal entry updated: ${editing.id}")
+                        },
+                        onCancel = { editingEntry = null }
+                    )
+                }
+            }
+
+            if (entries.isEmpty() && !showNewEntry && editingEntry == null) {
                 item {
                     Box(Modifier.fillMaxWidth().padding(top = 48.dp), contentAlignment = Alignment.Center) {
-                        Text("No entries yet. Tap the edit button to write your first journal entry.",
+                        Text(
+                            "No entries yet. Tap the edit button to write your first journal entry.",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium)
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             } else {
                 item {
-                    Text("Past Entries", style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        "Past Entries",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
                 items(entries, key = { it.id }) { entry ->
-                    JournalEntryCard(entry = entry)
+                    JournalEntryCard(
+                        entry = entry,
+                        onEdit = { editingEntry = entry },
+                        onDelete = { journalViewModel.deleteEntry(entry.id) }
+                    )
                 }
             }
         }
@@ -93,10 +121,19 @@ fun JournalScreen(journalViewModel: JournalViewModel = viewModel()) {
 }
 
 @Composable
-private fun NewEntryCard(onSave: (String, Int, Int) -> Unit, onCancel: () -> Unit) {
+private fun EntryCard(
+    initialNotes: String,
+    initialCompleted: Int,
+    onSave: (String, Int, Int) -> Unit,
+    onCancel: () -> Unit
+) {
     val checklistItems = listOf("Checked daily bias", "Confirmed session", "Risk calculated", "News checked")
-    val checklistState = remember { mutableStateMapOf<String, Boolean>().apply { checklistItems.forEach { put(it, false) } } }
-    var notes by remember { mutableStateOf("") }
+    val checklistState = remember {
+        mutableStateMapOf<String, Boolean>().apply {
+            checklistItems.forEachIndexed { i, item -> put(item, i < initialCompleted) }
+        }
+    }
+    var notes by remember { mutableStateOf(initialNotes) }
     val today = LocalDate.now().format(DateTimeFormatter.ofPattern("EEE, MMM d", Locale.ENGLISH))
 
     Card(
@@ -105,22 +142,29 @@ private fun NewEntryCard(onSave: (String, Int, Int) -> Unit, onCancel: () -> Uni
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Today's Entry — $today", style = MaterialTheme.typography.titleMedium,
-                color = Color.White, fontWeight = FontWeight.SemiBold)
+            Text(
+                if (initialNotes.isEmpty() && initialCompleted == 0) "Today's Entry — $today" else "Edit Entry",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold
+            )
 
-            // Checklist
             checklistItems.forEach { item ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = checklistState[item] == true,
                         onCheckedChange = { checklistState[item] = it },
-                        colors = CheckboxDefaults.colors(checkedColor = NeonGreen,
-                            uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant)
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = NeonGreen,
+                            uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text(item, style = MaterialTheme.typography.bodyMedium,
-                        color = if (checklistState[item] == true) Color.White
-                        else MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        item,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (checklistState[item] == true) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
@@ -131,11 +175,12 @@ private fun NewEntryCard(onSave: (String, Int, Int) -> Unit, onCancel: () -> Uni
                 color = NeonGreen,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
             )
-            Text("$completed / ${checklistItems.size} complete",
+            Text(
+                "$completed / ${checklistItems.size} complete",
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
-            // Notes
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
@@ -162,33 +207,54 @@ private fun NewEntryCard(onSave: (String, Int, Int) -> Unit, onCancel: () -> Uni
 }
 
 @Composable
-private fun JournalEntryCard(entry: JournalEntry) {
+private fun JournalEntryCard(entry: JournalEntry, onEdit: () -> Unit, onDelete: () -> Unit) {
     val displayDate = try {
         val parsed = LocalDate.parse(entry.date)
         parsed.format(DateTimeFormatter.ofPattern("EEE, MMM d yyyy", Locale.ENGLISH))
     } catch (e: Exception) { entry.date }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onEdit() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(displayDate, style = MaterialTheme.typography.titleSmall,
-                    color = Color.White, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                Icon(Icons.Default.CheckCircle, contentDescription = null,
+                Text(
+                    displayDate,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    Icons.Default.CheckCircle,
+                    contentDescription = null,
                     tint = if (entry.checklistCompleted == entry.checklistTotal) NeonGreen
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp))
+                           else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
                 Spacer(Modifier.width(4.dp))
-                Text("${entry.checklistCompleted}/${entry.checklistTotal}",
+                Text(
+                    "${entry.checklistCompleted}/${entry.checklistTotal}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.width(8.dp))
+                IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Purple, modifier = Modifier.size(16.dp))
+                }
+                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                }
             }
             if (entry.notes.isNotBlank()) {
-                Text(entry.notes, style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 3)
+                Text(
+                    entry.notes,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 3
+                )
             }
         }
     }
