@@ -29,6 +29,10 @@ function calcPnl(direction: string, entry: number, exit: number | null, qty: num
     : (entry - exit) * qty;
 }
 
+function formatTrade(trade: any) {
+  return { ...trade, tags: trade.tags ? trade.tags.split(',').filter(Boolean) : [] };
+}
+
 // GET /trades
 router.get('/', async (req: AuthRequest, res: Response) => {
   try {
@@ -41,7 +45,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
       },
       orderBy: { entryTime: 'desc' }
     });
-    res.json({ trades, total: trades.length });
+    res.json({ trades: trades.map(formatTrade), total: trades.length });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch trades' });
   }
@@ -74,7 +78,7 @@ router.post('/', async (req: AuthRequest, res: Response) => {
         syncedAt: new Date()
       }
     });
-    res.status(201).json(trade);
+    res.status(201).json(formatTrade(trade));
   } catch (err) {
     console.error('createTrade error:', err);
     res.status(500).json({ error: 'Failed to create trade' });
@@ -86,7 +90,7 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const trade = await prisma.trade.findFirst({ where: { id: req.params.id, userId: req.uid! } });
     if (!trade) { res.status(404).json({ error: 'Trade not found' }); return; }
-    res.json(trade);
+    res.json(formatTrade(trade));
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch trade' });
   }
@@ -112,7 +116,7 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
         syncedAt: new Date()
       }
     });
-    res.json(trade);
+    res.json(formatTrade(trade));
   } catch (err) {
     res.status(500).json({ error: 'Failed to update trade' });
   }
