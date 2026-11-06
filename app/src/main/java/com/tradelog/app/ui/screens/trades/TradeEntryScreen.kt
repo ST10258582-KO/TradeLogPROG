@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import com.tradelog.app.data.remote.TradeRequest
 import com.tradelog.app.ui.theme.Purple
+import com.tradelog.app.viewmodel.SettingsViewModel
 import com.tradelog.app.viewmodel.TradeViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -34,10 +35,12 @@ private const val TAG = "TradeEntryScreen"
 @Composable
 fun TradeEntryScreen(
     tradeViewModel: TradeViewModel,
+    settingsViewModel: SettingsViewModel,
     onDismiss: () -> Unit,
     editTradeId: String? = null
 ) {
     val existingTrade by tradeViewModel.selectedTrade.collectAsState()
+    val settings by settingsViewModel.settings.collectAsState()
     val isEditing = editTradeId != null && editTradeId != "new"
 
     var instrument by remember { mutableStateOf("") }
@@ -49,7 +52,10 @@ fun TradeEntryScreen(
     var quantity by remember { mutableStateOf("") }
     var pnlInput by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
-    var tagsInput by remember { mutableStateOf("") }
+    var selectedStrategies by remember { mutableStateOf(setOf<String>()) }
+    var selectedSession by remember { mutableStateOf("") }
+    var instrumentExpanded by remember { mutableStateOf(false) }
+    var sessionExpanded by remember { mutableStateOf(false) }
 
     // Pre-populate fields when editing
     LaunchedEffect(editTradeId) {
@@ -67,7 +73,8 @@ fun TradeEntryScreen(
             quantity = t.quantity.toString()
             pnlInput = t.pnl?.toString() ?: ""
             notes = t.notes ?: ""
-            tagsInput = t.tags.joinToString(", ")
+            selectedStrategies = t.tags.toSet()
+            selectedSession = t.session?.name ?: ""
         }
     }
     // Validation errors
@@ -103,17 +110,27 @@ fun TradeEntryScreen(
 
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
-            // Instrument
-            OutlinedTextField(
-                value = instrument,
-                onValueChange = { instrument = it.uppercase(); instrumentError = null },
-                label = { Text("Instrument") },
-                placeholder = { Text("e.g. NQ, ES, GC") },
-                isError = instrumentError != null,
-                supportingText = { instrumentError?.let { Text(it, color = MaterialTheme.colorScheme.error) } },
-                modifier = Modifier.fillMaxWidth(),
-                colors = outlinedColors()
-            )
+            // Instrument dropdown
+            ExposedDropdownMenuBox(expanded = instrumentExpanded, onExpandedChange = { instrumentExpanded = it }) {
+                OutlinedTextField(
+                    value = instrument,
+                    onValueChange = { instrument = it.uppercase(); instrumentError = null },
+                    label = { Text("Instrument") },
+                    isError = instrumentError != null,
+                    supportingText = { instrumentError?.let { Text(it, color = MaterialTheme.colorScheme.error) } },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = instrumentExpanded) },
+                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    colors = outlinedColors()
+                )
+                ExposedDropdownMenu(expanded = instrumentExpanded, onDismissRequest = { instrumentExpanded = false }) {
+                    settings.instruments.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = { instrument = option; instrumentError = null; instrumentExpanded = false }
+                        )
+                    }
+                }
+            }
 
             // Direction toggle
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -145,15 +162,38 @@ fun TradeEntryScreen(
 
             PriceField("P&L ($) (opt.)", pnlInput, null, Modifier.fillMaxWidth()) { pnlInput = it }
 
-            // Strategy tags
-            OutlinedTextField(
-                value = tagsInput,
-                onValueChange = { tagsInput = it },
-                label = { Text("Strategy Tags") },
-                placeholder = { Text("ORB, Breakout, Reversion (comma-separated)") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = outlinedColors()
-            )
+            // Strategy multi-select chips
+            Text("Strategy", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                settings.strategies.forEach { strat ->
+                    val selected = selectedStrategies.contains(strat)
+                    FilterChip(
+                        selected = selected,
+                        onClick = { selectedStrategies = if (selected) selectedStrategies - strat else selectedStrategies + strat },
+                        label = { Text(strat, style = MaterialTheme.typography.labelSmall) },
+                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Purple, selectedLabelColor = Color.White)
+                    )
+                }
+            }
+
+            // Session dropdown
+            ExposedDropdownMenuBox(expanded = sessionExpanded, onExpandedChange = { sessionExpanded = it }) {
+                OutlinedTextField(
+                    value = selectedSession,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Session (opt.)") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sessionExpanded) },
+                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    colors = outlinedColors()
+                )
+                ExposedDropdownMenu(expanded = sessionExpanded, onDismissRequest = { sessionExpanded = false }) {
+                    DropdownMenuItem(text = { Text("Auto-detect") }, onClick = { selectedSession = ""; sessionExpanded = false })
+                    settings.sessions.forEach { session ->
+                        DropdownMenuItem(text = { Text(session) }, onClick = { selectedSession = session; sessionExpanded = false })
+                    }
+                }
+            }
 
             // Notes
             OutlinedTextField(
@@ -180,7 +220,7 @@ fun TradeEntryScreen(
                     if (!valid) return@Button
 
                     val now = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                    val tags = tagsInput.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                    val tags = selectedStrategies.toList()
 
                     val request = TradeRequest(
                         instrument = instrument,

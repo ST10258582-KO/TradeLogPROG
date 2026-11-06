@@ -26,13 +26,45 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             initialValue = UserSettings()
         )
 
-    // Save updated settings — persists locally and syncs to API (FR-03)
     fun saveSettings(updated: UserSettings) {
         viewModelScope.launch {
             Log.d(TAG, "saveSettings() — displayName=${updated.displayName} lang=${updated.language}")
             settingsRepository.saveSettings(updated)
             Log.i(TAG, "Settings saved successfully")
         }
+    }
+
+    fun addInstrument(value: String) {
+        val current = settings.value
+        if (value.isBlank() || current.instruments.contains(value)) return
+        viewModelScope.launch { settingsRepository.saveSettings(current.copy(instruments = current.instruments + value.uppercase())) }
+    }
+
+    fun removeInstrument(value: String) {
+        val current = settings.value
+        viewModelScope.launch { settingsRepository.saveSettings(current.copy(instruments = current.instruments - value)) }
+    }
+
+    fun addStrategy(value: String) {
+        val current = settings.value
+        if (value.isBlank() || current.strategies.contains(value)) return
+        viewModelScope.launch { settingsRepository.saveSettings(current.copy(strategies = current.strategies + value)) }
+    }
+
+    fun removeStrategy(value: String) {
+        val current = settings.value
+        viewModelScope.launch { settingsRepository.saveSettings(current.copy(strategies = current.strategies - value)) }
+    }
+
+    fun addSession(value: String) {
+        val current = settings.value
+        if (value.isBlank() || current.sessions.contains(value)) return
+        viewModelScope.launch { settingsRepository.saveSettings(current.copy(sessions = current.sessions + value.uppercase())) }
+    }
+
+    fun removeSession(value: String) {
+        val current = settings.value
+        viewModelScope.launch { settingsRepository.saveSettings(current.copy(sessions = current.sessions - value)) }
     }
 
     override fun onCleared() {

@@ -7,6 +7,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tradelog.app.R
 import com.tradelog.app.data.repository.UserSettings
 import com.tradelog.app.ui.theme.LossRed
@@ -139,6 +141,30 @@ fun SettingsScreen(
             }
         }
 
+        // Instruments
+        ManageListCard(
+            title = "Instruments",
+            items = settings.instruments,
+            onAdd = { settingsViewModel.addInstrument(it) },
+            onRemove = { settingsViewModel.removeInstrument(it) }
+        )
+
+        // Strategies
+        ManageListCard(
+            title = "Strategies",
+            items = settings.strategies,
+            onAdd = { settingsViewModel.addStrategy(it) },
+            onRemove = { settingsViewModel.removeStrategy(it) }
+        )
+
+        // Sessions
+        ManageListCard(
+            title = "Sessions",
+            items = settings.sessions,
+            onAdd = { settingsViewModel.addSession(it) },
+            onRemove = { settingsViewModel.removeSession(it) }
+        )
+
         // Save button
         Button(
             onClick = {
@@ -179,6 +205,56 @@ fun SettingsScreen(
             border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(LossRed))
         ) {
             Text("Sign Out", color = LossRed, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
+@Composable
+private fun ManageListCard(
+    title: String,
+    items: List<String>,
+    onAdd: (String) -> Unit,
+    onRemove: (String) -> Unit
+) {
+    var newItem by remember { mutableStateOf("") }
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, color = Color.White, fontWeight = FontWeight.SemiBold)
+            androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items.forEach { item ->
+                    InputChip(
+                        selected = false,
+                        onClick = {},
+                        label = { Text(item, style = MaterialTheme.typography.labelMedium) },
+                        trailingIcon = {
+                            IconButton(onClick = { onRemove(item) }, modifier = Modifier.size(16.dp)) {
+                                Icon(Icons.Default.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(12.dp))
+                            }
+                        },
+                        colors = InputChipDefaults.inputChipColors(containerColor = Purple.copy(alpha = 0.15f), labelColor = Color.White)
+                    )
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = newItem,
+                    onValueChange = { newItem = it },
+                    placeholder = { Text("Add $title".dropLast(1), style = MaterialTheme.typography.bodySmall) },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Purple, focusedLabelColor = Purple, cursorColor = Purple)
+                )
+                IconButton(
+                    onClick = { if (newItem.isNotBlank()) { onAdd(newItem.trim()); newItem = "" } },
+                    modifier = Modifier.size(48.dp).background(Purple, RoundedCornerShape(8.dp))
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
+                }
+            }
         }
     }
 }

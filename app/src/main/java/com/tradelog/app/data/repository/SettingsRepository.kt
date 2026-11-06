@@ -20,7 +20,6 @@ class SettingsRepository(private val context: Context) {
 
     private val TAG = "SettingsRepository"
 
-    // Preference keys
     companion object {
         val KEY_DISPLAY_NAME = stringPreferencesKey("display_name")
         val KEY_TIMEZONE = stringPreferencesKey("timezone")
@@ -28,9 +27,15 @@ class SettingsRepository(private val context: Context) {
         val KEY_CURRENCY = stringPreferencesKey("currency")
         val KEY_LANGUAGE = stringPreferencesKey("language")
         val KEY_NOTIFICATIONS = booleanPreferencesKey("notifications")
+        val KEY_INSTRUMENTS = stringPreferencesKey("instruments")
+        val KEY_STRATEGIES = stringPreferencesKey("strategies")
+        val KEY_SESSIONS = stringPreferencesKey("sessions")
+
+        val DEFAULT_INSTRUMENTS = listOf("NQ", "ES", "GC", "US30m", "UK100m", "USTECm", "EURUSD", "GBPUSD")
+        val DEFAULT_STRATEGIES = listOf("ORB", "Breakout", "Trend Pullback", "Mean Reversion", "News Trade", "Scalp")
+        val DEFAULT_SESSIONS = listOf("LONDON", "NEW_YORK", "ASIA", "OTHER")
     }
 
-    // Observe settings as a Flow — UI collects and reacts to changes automatically
     val settingsFlow: Flow<UserSettings> = context.dataStore.data
         .catch { e ->
             Log.e(TAG, "DataStore read error: ${e.message}", e)
@@ -43,11 +48,13 @@ class SettingsRepository(private val context: Context) {
                 defaultRisk = prefs[KEY_DEFAULT_RISK] ?: 1.0f,
                 currency = prefs[KEY_CURRENCY] ?: "USD",
                 language = prefs[KEY_LANGUAGE] ?: "en",
-                notifications = prefs[KEY_NOTIFICATIONS] ?: true
+                notifications = prefs[KEY_NOTIFICATIONS] ?: true,
+                instruments = prefs[KEY_INSTRUMENTS]?.split(",")?.filter { it.isNotBlank() } ?: DEFAULT_INSTRUMENTS,
+                strategies = prefs[KEY_STRATEGIES]?.split(",")?.filter { it.isNotBlank() } ?: DEFAULT_STRATEGIES,
+                sessions = prefs[KEY_SESSIONS]?.split(",")?.filter { it.isNotBlank() } ?: DEFAULT_SESSIONS
             )
         }
 
-    // Persist settings locally and sync to API
     suspend fun saveSettings(settings: UserSettings) {
         try {
             Log.d(TAG, "Saving settings for: ${settings.displayName}")
@@ -58,6 +65,9 @@ class SettingsRepository(private val context: Context) {
                 prefs[KEY_CURRENCY] = settings.currency
                 prefs[KEY_LANGUAGE] = settings.language
                 prefs[KEY_NOTIFICATIONS] = settings.notifications
+                prefs[KEY_INSTRUMENTS] = settings.instruments.joinToString(",")
+                prefs[KEY_STRATEGIES] = settings.strategies.joinToString(",")
+                prefs[KEY_SESSIONS] = settings.sessions.joinToString(",")
             }
             // Sync to REST API (FR-03)
             val response = RetrofitClient.apiService.updateSettings(
@@ -88,5 +98,8 @@ data class UserSettings(
     val defaultRisk: Float = 1.0f,
     val currency: String = "USD",
     val language: String = "en",
-    val notifications: Boolean = true
+    val notifications: Boolean = true,
+    val instruments: List<String> = SettingsRepository.DEFAULT_INSTRUMENTS,
+    val strategies: List<String> = SettingsRepository.DEFAULT_STRATEGIES,
+    val sessions: List<String> = SettingsRepository.DEFAULT_SESSIONS
 )

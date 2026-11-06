@@ -157,6 +157,7 @@ fun AppNavigation() {
                 val tradeId = backStackEntry.arguments?.getString("tradeId")
                 TradeEntryScreen(
                     tradeViewModel = tradeViewModel,
+                    settingsViewModel = settingsViewModel,
                     onDismiss = { navController.popBackStack() },
                     editTradeId = tradeId
                 )
