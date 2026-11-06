@@ -175,7 +175,7 @@ fun AppNavigation() {
                 )
             }
             composable(Screen.Analytics.route) {
-                AnalyticsScreen(tradeViewModel = tradeViewModel, analyticsViewModel = analyticsViewModel)
+                AnalyticsScreen(tradeViewModel = tradeViewModel, analyticsViewModel = analyticsViewModel, settingsViewModel = settingsViewModel)
             }
             composable(Screen.Journal.route) { JournalScreen() }
             composable(Screen.Settings.route) {
