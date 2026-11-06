@@ -1,13 +1,16 @@
 package com.tradelog.app.viewmodel
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.tradelog.app.data.local.AppDatabase
 import com.tradelog.app.data.model.Trade
 import com.tradelog.app.data.remote.AnalyticsSummary
 import com.tradelog.app.data.remote.EquityCurvePoint
 import com.tradelog.app.data.remote.TradeRequest
 import com.tradelog.app.data.repository.TradeRepository
+import com.tradelog.app.util.NotificationHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,9 +18,10 @@ import kotlinx.coroutines.launch
 
 // TradeViewModel manages trade list, analytics summary, and equity curve data.
 // Drives the Dashboard, Trades List, Trade Entry, and Trade Detail screens (FR-04 to FR-07).
-class TradeViewModel(
-    private val tradeRepository: TradeRepository = TradeRepository()
-) : ViewModel() {
+// Uses AndroidViewModel to access Room database for offline caching.
+class TradeViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val tradeRepository = TradeRepository(AppDatabase.getInstance(application).tradeDao())
 
     private val TAG = "TradeViewModel"
 
@@ -102,6 +106,7 @@ class TradeViewModel(
             tradeRepository.createTrade(request).fold(
                 onSuccess = {
                     Log.i(TAG, "Trade created: ${it.id}")
+                    NotificationHelper.showTradeLoggedNotification(getApplication(), it.instrument, it.pnl)
                     loadTrades()
                     loadDashboard()
                     onSuccess()

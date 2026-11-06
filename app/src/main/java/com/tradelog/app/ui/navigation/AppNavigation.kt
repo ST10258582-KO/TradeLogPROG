@@ -61,7 +61,10 @@ fun AppNavigation() {
 
     // Shared ViewModels — scoped to NavHost lifecycle
     val authViewModel: AuthViewModel = viewModel()
-    val tradeViewModel: TradeViewModel = viewModel()
+    val tradeViewModel: TradeViewModel = viewModel(
+        factory = androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+            .getInstance(context.applicationContext as Application)
+    )
     val analyticsViewModel: AnalyticsViewModel = viewModel()
     val settingsViewModel: SettingsViewModel = viewModel(
         factory = androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
