@@ -153,15 +153,25 @@ fun AppNavigation() {
             composable(
                 route = Screen.TradeEntry.route,
                 arguments = listOf(navArgument("tradeId") { type = NavType.StringType; nullable = true; defaultValue = null })
-            ) {
-                TradeEntryScreen(tradeViewModel = tradeViewModel, onDismiss = { navController.popBackStack() })
+            ) { backStackEntry ->
+                val tradeId = backStackEntry.arguments?.getString("tradeId")
+                TradeEntryScreen(
+                    tradeViewModel = tradeViewModel,
+                    onDismiss = { navController.popBackStack() },
+                    editTradeId = tradeId
+                )
             }
             composable(
                 route = Screen.TradeDetail.route,
                 arguments = listOf(navArgument("tradeId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val tradeId = backStackEntry.arguments?.getString("tradeId") ?: return@composable
-                TradeDetailScreen(tradeId = tradeId, tradeViewModel = tradeViewModel, onBack = { navController.popBackStack() })
+                TradeDetailScreen(
+                    tradeId = tradeId,
+                    tradeViewModel = tradeViewModel,
+                    onBack = { navController.popBackStack() },
+                    onEdit = { id -> navController.navigate(Screen.TradeEntry.route(id)) }
+                )
             }
             composable(Screen.Analytics.route) {
                 AnalyticsScreen(tradeViewModel = tradeViewModel, analyticsViewModel = analyticsViewModel)

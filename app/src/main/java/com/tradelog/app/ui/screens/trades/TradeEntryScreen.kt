@@ -34,8 +34,12 @@ private const val TAG = "TradeEntryScreen"
 @Composable
 fun TradeEntryScreen(
     tradeViewModel: TradeViewModel,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    editTradeId: String? = null
 ) {
+    val existingTrade by tradeViewModel.selectedTrade.collectAsState()
+    val isEditing = editTradeId != null && editTradeId != "new"
+
     var instrument by remember { mutableStateOf("") }
     var direction by remember { mutableStateOf("BUY") }
     var entryPrice by remember { mutableStateOf("") }
@@ -47,6 +51,25 @@ fun TradeEntryScreen(
     var notes by remember { mutableStateOf("") }
     var tagsInput by remember { mutableStateOf("") }
 
+    // Pre-populate fields when editing
+    LaunchedEffect(editTradeId) {
+        if (isEditing) tradeViewModel.loadTrade(editTradeId!!)
+    }
+    LaunchedEffect(existingTrade) {
+        val t = existingTrade
+        if (isEditing && t != null && t.id == editTradeId) {
+            instrument = t.instrument
+            direction = t.direction.name
+            entryPrice = t.entryPrice.toString()
+            stopLoss = t.stopLoss.toString()
+            takeProfit = t.takeProfit.toString()
+            exitPrice = t.exitPrice?.toString() ?: ""
+            quantity = t.quantity.toString()
+            pnlInput = t.pnl?.toString() ?: ""
+            notes = t.notes ?: ""
+            tagsInput = t.tags.joinToString(", ")
+        }
+    }
     // Validation errors
     var instrumentError by remember { mutableStateOf<String?>(null) }
     var entryError by remember { mutableStateOf<String?>(null) }
@@ -71,7 +94,7 @@ fun TradeEntryScreen(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Log Trade", style = MaterialTheme.typography.titleLarge, color = Color.White, modifier = Modifier.weight(1f))
+            Text(if (isEditing) "Edit Trade" else "Log Trade", style = MaterialTheme.typography.titleLarge, color = Color.White, modifier = Modifier.weight(1f))
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -159,24 +182,27 @@ fun TradeEntryScreen(
                     val now = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                     val tags = tagsInput.split(",").map { it.trim() }.filter { it.isNotBlank() }
 
-                    Log.d(TAG, "Submitting trade: $instrument $direction entry=$entry")
-                    tradeViewModel.createTrade(
-                        TradeRequest(
-                            instrument = instrument,
-                            direction = direction,
-                            entryPrice = entry!!,
-                            stopLoss = sl!!,
-                            takeProfit = tp!!,
-                            exitPrice = exitPrice.toDoubleOrNull(),
-                            quantity = qty!!,
-                            pnl = pnlInput.toDoubleOrNull(),
-                            notes = notes.ifBlank { null },
-                            tags = tags,
-                            entryTime = now,
-                            exitTime = null
-                        ),
-                        onSuccess = { onDismiss() }
+                    val request = TradeRequest(
+                        instrument = instrument,
+                        direction = direction,
+                        entryPrice = entry!!,
+                        stopLoss = sl!!,
+                        takeProfit = tp!!,
+                        exitPrice = exitPrice.toDoubleOrNull(),
+                        quantity = qty!!,
+                        pnl = pnlInput.toDoubleOrNull(),
+                        notes = notes.ifBlank { null },
+                        tags = tags,
+                        entryTime = now,
+                        exitTime = null
                     )
+                    if (isEditing) {
+                        Log.d(TAG, "Updating trade: $editTradeId")
+                        tradeViewModel.updateTrade(editTradeId!!, request, onSuccess = { onDismiss() })
+                    } else {
+                        Log.d(TAG, "Submitting trade: $instrument $direction entry=$entry")
+                        tradeViewModel.createTrade(request, onSuccess = { onDismiss() })
+                    }
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(8.dp),
@@ -186,7 +212,7 @@ fun TradeEntryScreen(
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
                 } else {
-                    Text("LOG TRADE", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(if (isEditing) "SAVE CHANGES" else "LOG TRADE", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
         }

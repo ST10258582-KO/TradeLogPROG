@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,10 +31,11 @@ private const val TAG = "TradeDetailScreen"
 fun TradeDetailScreen(
     tradeId: String,
     tradeViewModel: TradeViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onEdit: (String) -> Unit
 ) {
     val trade by tradeViewModel.selectedTrade.collectAsState()
-    val isLoading by tradeViewModel.isLoading.collectAsState()
+    val isLoading by tradeViewModel.isDetailLoading.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(tradeId) {
@@ -77,15 +79,22 @@ fun TradeDetailScreen(
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
             }
             Text("Trade Detail", style = MaterialTheme.typography.titleLarge, color = Color.White, modifier = Modifier.weight(1f))
+            IconButton(onClick = { onEdit(tradeId) }) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Purple)
+            }
             IconButton(onClick = { showDeleteDialog = true }) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete", tint = LossRed)
             }
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
-        if (isLoading || trade == null) {
+        if (isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Purple)
+            }
+        } else if (trade == null) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Trade not found", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
             val t = trade!!
