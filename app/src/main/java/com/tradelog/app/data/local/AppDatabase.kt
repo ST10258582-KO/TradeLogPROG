@@ -12,7 +12,6 @@ import com.tradelog.app.data.local.entities.TradeEntity
 
 // Room database — the single source of truth for offline-first data access.
 // All network data is written here first; Firestore is kept in sync via SyncWorker.
-// Reference: Google LLC, "Room Persistence Library" Android Developers (2024)
 @Database(
     entities = [TradeEntity::class, JournalEntity::class],
     version = 1,
@@ -46,7 +45,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     DB_NAME
                 )
-                    .fallbackToDestructiveMigration(dropAllTables = true)   // Dev mode; replace with Migration objects in production
+                    .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
                     .also { INSTANCE = it }
             }

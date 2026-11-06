@@ -12,8 +12,6 @@ import com.tradelog.app.R
 import com.tradelog.app.TradeLogApplication
 
 // Firebase Cloud Messaging service — handles incoming push notifications from FCM.
-// This satisfies the POE requirement: "Real-time Notifications via Firebase Cloud Messaging."
-// Reference: Firebase, "Firebase Cloud Messaging for Android" (Google LLC, 2024)
 class TradeLogMessagingService : FirebaseMessagingService() {
 
     private val TAG = "TradeLogMsgService"
@@ -23,8 +21,6 @@ class TradeLogMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.i(TAG, "New FCM token generated — length=${token.length}")
-        // In production: send this token to your REST API to store against the user account
-        // so the server can send targeted push notifications to this device
     }
 
     // Called when a push message is received while the app is in the foreground.

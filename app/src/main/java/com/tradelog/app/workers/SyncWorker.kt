@@ -13,9 +13,7 @@ import kotlinx.coroutines.tasks.await
 import java.time.Instant
 
 // SyncWorker runs in the background and uploads locally-modified trades to Firestore
-// once a network connection is available. This provides the offline-sync architecture
-// required by the POE "Offline Mode with Synchronisation" feature.
-// Reference: Google LLC, "WorkManager" Android Developers (2024)
+// once a network connection is available.
 class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     private val TAG = "SyncWorker"

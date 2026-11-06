@@ -12,8 +12,6 @@ import kotlinx.coroutines.tasks.await
 
 // FirestoreRepository handles all Firestore NoSQL read and write operations.
 // Data is organised under: users/{uid}/trades/{tradeId}
-// This satisfies the POE requirement: "Use a NoSQL database to store and read data."
-// Reference: Firebase, "Cloud Firestore" (Google LLC, 2024)
 class FirestoreRepository {
 
     private val TAG = "FirestoreRepository"

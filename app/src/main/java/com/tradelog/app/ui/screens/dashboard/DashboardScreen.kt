@@ -158,8 +158,7 @@ private fun StatCard(label: String, value: String, valueColor: Color = Color.Whi
     }
 }
 
-// Equity curve rendered with Jetpack Compose Canvas API (FR-07, innovative feature).
-// Reference: Google LLC, "Canvas in Compose" Android Developers (2024)
+// Equity curve rendered with Jetpack Compose Canvas API.
 @Composable
 private fun EquityCurveCard(points: List<EquityCurvePoint>) {
     Card(

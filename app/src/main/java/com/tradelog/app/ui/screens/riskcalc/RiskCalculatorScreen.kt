@@ -25,11 +25,10 @@ import kotlin.math.abs
 
 private const val TAG = "RiskCalculatorScreen"
 
-// Risk Calculator Screen — User Defined Feature 5.
+// Risk Calculator Screen.
 // Allows traders to calculate exact position size, dollar risk, and R:R ratio
 // given their account balance, risk percentage, and stop loss distance.
 // Operates fully offline — no network required.
-// Reference: Van Tharp (2008), "Trade Your Way to Financial Freedom" — position sizing methodology
 @Composable
 fun RiskCalculatorScreen(onBack: () -> Unit) {
 

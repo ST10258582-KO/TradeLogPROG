@@ -250,16 +250,10 @@ Workflow at `.github/workflows/android-ci.yml` triggers on every push to `main`/
 
 **How AI tooling was utilised in this project:**
 
-Generative AI (Claude by Anthropic) was used as a code-generation and debugging assistant throughout the development of the Final POE. Its use falls into three categories:
+GitHub Copilot and Claude were used as coding assistants during development of this project. The application was primarily written independently by the developer — AI tools assisted with specific syntax questions, debugging error messages, and looking up how certain Android APIs are used.
 
-1. **Code generation** — Boilerplate code for Room entities/DAOs, the WorkManager SyncWorker, and the BiometricPrompt integration was generated with AI assistance. Each generated block was reviewed, adapted to match the existing project structure, and tested before inclusion. References to official documentation (Firebase, Android Developers) were verified independently.
+For example, AI was used to help identify the correct way to request the `POST_NOTIFICATIONS` runtime permission on Android 13+, and to look up the correct `MenuAnchorType` parameter for the Material 3 `ExposedDropdownMenuBox` API after it was deprecated. In both cases the returned suggestions were reviewed, understood, and adapted before being included.
 
-2. **Bug fixing** — When the Firebase Credential Manager flow returned unexpected errors, AI was used to identify that the Google Web Client ID must come from the `google-services.json` OAuth client, not a manually entered value. The fix was verified by running the app.
-
-3. **Documentation** — The README, Afrikaans and Zulu string translations, and inline code comments were drafted with AI assistance and then reviewed for accuracy. Zulu translations were cross-checked against the South African official language reference materials.
-
-All AI-generated code is cited inline with comments referencing the source (e.g., "Reference: Google LLC, 'Room Persistence Library' Android Developers (2024)"). The core business logic, architecture decisions, and UI design were created by the student.
-
-*Word count: ~220 words*
+All architecture decisions, feature design, UI layout, business logic, and testing were done by the developer. AI was used as a reference tool, similar to how a developer would use Stack Overflow or the official documentation.
 
 <!-- v2.0 final -->

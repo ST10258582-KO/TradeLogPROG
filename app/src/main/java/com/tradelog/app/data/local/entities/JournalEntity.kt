@@ -5,7 +5,6 @@ import androidx.room.PrimaryKey
 
 // Room entity that persists daily journal entries locally for offline access.
 // Users can write pre/post-market notes even when there is no network connection.
-// Reference: Google LLC, "Room Persistence Library" Android Developers (2024)
 @Entity(tableName = "journal_entries")
 data class JournalEntity(
     @PrimaryKey val id: String,

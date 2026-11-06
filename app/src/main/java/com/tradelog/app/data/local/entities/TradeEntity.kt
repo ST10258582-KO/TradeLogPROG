@@ -9,7 +9,6 @@ import com.tradelog.app.data.model.TradeStatus
 
 // Room entity that persists Trade data locally for offline-first architecture.
 // Mirrors the domain Trade model but uses flat primitive fields for Room compatibility.
-// Reference: Google LLC, "Room Persistence Library" Android Developers (2024)
 @Entity(tableName = "trades")
 data class TradeEntity(
     @PrimaryKey val id: String,

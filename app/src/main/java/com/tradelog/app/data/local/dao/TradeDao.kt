@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 
 // Data Access Object for the trades table.
 // All queries are suspend functions or Flows for safe coroutine-based access.
-// Reference: Google LLC, "Room DAO" Android Developers (2024)
 @Dao
 interface TradeDao {
 

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 // Extension property to create a single DataStore instance per application lifecycle.
-// Reference: Google LLC, "DataStore" Android Developers (2024)
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "tradelog_settings")
 
 // SettingsRepository persists user preferences locally via DataStore and syncs to the REST API.

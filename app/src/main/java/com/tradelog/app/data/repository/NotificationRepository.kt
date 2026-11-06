@@ -6,7 +6,6 @@ import kotlinx.coroutines.tasks.await
 
 // NotificationRepository handles FCM token retrieval and topic subscriptions.
 // Topic subscriptions allow targeted push notifications to groups of users.
-// Reference: Firebase, "Firebase Cloud Messaging Topics" (Google LLC, 2024)
 class NotificationRepository {
 
     private val TAG = "NotificationRepository"

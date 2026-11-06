@@ -16,7 +16,6 @@ import com.tradelog.app.ui.theme.TradeLogTheme
 
 // Single Activity — hosts the entire Jetpack Compose UI.
 // All navigation is handled by the Jetpack Navigation Compose NavHost inside AppNavigation.
-// Reference: Google LLC, "Guide to App Architecture" Android Developers (2024)
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "MainActivity"

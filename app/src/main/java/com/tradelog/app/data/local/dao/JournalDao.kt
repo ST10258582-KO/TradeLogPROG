@@ -8,7 +8,6 @@ import com.tradelog.app.data.local.entities.JournalEntity
 import kotlinx.coroutines.flow.Flow
 
 // Data Access Object for the journal_entries table.
-// Reference: Google LLC, "Room DAO" Android Developers (2024)
 @Dao
 interface JournalDao {
 

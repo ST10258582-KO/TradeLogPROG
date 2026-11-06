@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit
 
 // Application class — initialises app-wide singletons and schedules background work.
 // Registered in AndroidManifest.xml via android:name=".TradeLogApplication".
-// Reference: Google LLC, "Application class" Android Developers (2024)
 class TradeLogApplication : Application() {
 
     private val TAG = "TradeLogApplication"
@@ -34,7 +33,6 @@ class TradeLogApplication : Application() {
     /**
      * Create notification channels required for Android 8.0+ (API 26+).
      * Channels created here are persistent and only need to be registered once per install.
-     * Reference: Google LLC, "Create and Manage Notification Channels" (2024)
      */
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
