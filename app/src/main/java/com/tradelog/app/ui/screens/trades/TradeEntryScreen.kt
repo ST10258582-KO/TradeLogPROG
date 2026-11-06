@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import com.tradelog.app.data.remote.TradeRequest
 import com.tradelog.app.ui.theme.Purple
 import com.tradelog.app.viewmodel.SettingsViewModel
@@ -32,6 +33,7 @@ private const val TAG = "TradeEntryScreen"
 // Trade Entry form — full-screen form for logging a new trade (FR-04).
 // Captures instrument, direction, entry/stop/TP, position size, strategy tags, and notes.
 // R-multiple and session classification are computed server-side.
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun TradeEntryScreen(
     tradeViewModel: TradeViewModel,
@@ -119,7 +121,7 @@ fun TradeEntryScreen(
                     isError = instrumentError != null,
                     supportingText = { instrumentError?.let { Text(it, color = MaterialTheme.colorScheme.error) } },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = instrumentExpanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryEditable),
                     colors = outlinedColors()
                 )
                 ExposedDropdownMenu(expanded = instrumentExpanded, onDismissRequest = { instrumentExpanded = false }) {
@@ -184,7 +186,7 @@ fun TradeEntryScreen(
                     readOnly = true,
                     label = { Text("Session (opt.)") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sessionExpanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
                     colors = outlinedColors()
                 )
                 ExposedDropdownMenu(expanded = sessionExpanded, onDismissRequest = { sessionExpanded = false }) {
