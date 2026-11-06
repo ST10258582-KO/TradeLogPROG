@@ -15,6 +15,8 @@ import com.tradelog.app.data.remote.SessionStats
 import com.tradelog.app.data.remote.TagStats
 import com.tradelog.app.data.remote.TradeRequest
 import com.tradelog.app.data.remote.TradeResponse
+import java.time.Instant
+import java.util.UUID
 
 // TradeRepository handles all trade data operations via the REST API (FR-04 to FR-07).
 // Falls back to the local Room cache when the network is unavailable (offline mode).
@@ -63,7 +65,8 @@ class TradeRepository(private val tradeDao: TradeDao? = null) {
         return Result.failure(Exception("Offline and no local cache available"))
     }
 
-    // Create a new trade entry (FR-04). On success, also caches to Room.
+    // Create a new trade entry (FR-04).
+    // On success: caches to Room. On API failure: saves locally as pending sync.
     suspend fun createTrade(request: TradeRequest): Result<Trade> {
         return try {
             Log.d(TAG, "Creating trade: ${request.instrument} ${request.direction}")
@@ -74,13 +77,47 @@ class TradeRepository(private val tradeDao: TradeDao? = null) {
                 tradeDao?.insertOrReplace(TradeEntity.fromDomain(trade))
                 Result.success(trade)
             } else {
-                Log.e(TAG, "createTrade failed: HTTP ${response.code()}")
-                Result.failure(Exception("HTTP ${response.code()}"))
+                Log.w(TAG, "createTrade HTTP ${response.code()} — saving locally as pending")
+                saveLocallyAsPending(request)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "createTrade error: ${e.message}", e)
-            Result.failure(e)
+            Log.w(TAG, "createTrade offline (${e.message}) — saving locally as pending")
+            saveLocallyAsPending(request)
         }
+    }
+
+    // Saves a trade to Room with isPendingSync=true when the API is unreachable.
+    // SyncWorker will upload it to the server next time the device is online.
+    private suspend fun saveLocallyAsPending(request: TradeRequest): Result<Trade> {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+            ?: return Result.failure(Exception("Not authenticated"))
+        if (tradeDao == null) return Result.failure(Exception("No local database available"))
+
+        val now = Instant.now().toString()
+        val trade = Trade(
+            id = UUID.randomUUID().toString(),
+            userId = uid,
+            instrument = request.instrument,
+            direction = if (request.direction == "BUY") TradeDirection.BUY else TradeDirection.SELL,
+            entryPrice = request.entryPrice,
+            stopLoss = request.stopLoss,
+            takeProfit = request.takeProfit,
+            exitPrice = request.exitPrice,
+            quantity = request.quantity,
+            rMultiple = null,
+            pnl = request.pnl,
+            session = request.session?.let { runCatching { TradingSession.valueOf(it) }.getOrNull() },
+            status = if (request.exitPrice != null) TradeStatus.CLOSED else TradeStatus.OPEN,
+            notes = request.notes,
+            entryTime = request.entryTime,
+            exitTime = request.exitTime,
+            tags = request.tags,
+            createdAt = now,
+            syncedAt = null
+        )
+        tradeDao.insertOrReplace(TradeEntity.fromDomain(trade, isPendingSync = true))
+        Log.i(TAG, "Trade saved locally (pending sync): ${trade.id}")
+        return Result.success(trade)
     }
 
     // Fetch a single trade by ID (FR-06)
