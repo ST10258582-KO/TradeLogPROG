@@ -15,9 +15,7 @@ object RetrofitClient {
 
     private const val TAG = "RetrofitClient"
 
-    // TODO: Replace BASE_URL with deployed Azure App Service endpoint after deployment.
-    // e.g. "https://tradelog-api.azurewebsites.net/"
-    const val BASE_URL = "http://10.0.2.2:8080/"
+    const val BASE_URL = "https://tradelog-api-17ra.onrender.com/"
 
     // Auth token — set after Firebase sign-in (FR-02). Injected into every request header.
     var authToken: String? = null
