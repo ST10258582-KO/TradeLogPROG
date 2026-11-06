@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Declares supported app languages for per-app language switching (FR-03).
+     Required for Android 13+ (API 33) native per-app language support.
+     Reference: Google LLC, "Per-app language preferences" Android Developers (2024) -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en"/>
+    <locale android:name="af"/>
+    <locale android:name="zu"/>
+</locale-config>

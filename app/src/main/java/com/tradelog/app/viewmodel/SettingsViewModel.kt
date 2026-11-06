@@ -2,6 +2,8 @@ package com.tradelog.app.viewmodel
 
 import android.app.Application
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.tradelog.app.data.repository.SettingsRepository
@@ -30,7 +32,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             Log.d(TAG, "saveSettings() — displayName=${updated.displayName} lang=${updated.language}")
             settingsRepository.saveSettings(updated)
-            Log.i(TAG, "Settings saved successfully")
+            // Apply the selected locale immediately — Activity recreates with new language (FR-03)
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(updated.language))
+            Log.i(TAG, "Settings saved — locale set to ${updated.language}")
         }
     }
 
