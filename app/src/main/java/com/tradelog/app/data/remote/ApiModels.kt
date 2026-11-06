@@ -39,7 +39,8 @@ data class TradeRequest(
     val notes: String?,
     val tags: List<String>,
     val entryTime: String,       // ISO-8601
-    val exitTime: String?
+    val exitTime: String?,
+    val session: String?         // "LONDON" | "NEW_YORK" | "ASIA" | "OTHER" — overrides auto-classify
 )
 
 data class TradeResponse(

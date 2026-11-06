@@ -236,7 +236,8 @@ fun TradeEntryScreen(
                         notes = notes.ifBlank { null },
                         tags = tags,
                         entryTime = now,
-                        exitTime = null
+                        exitTime = null,
+                        session = selectedSession.ifBlank { null }
                     )
                     if (isEditing) {
                         Log.d(TAG, "Updating trade: $editTradeId")

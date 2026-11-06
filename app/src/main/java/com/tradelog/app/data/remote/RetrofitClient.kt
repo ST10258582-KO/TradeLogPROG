@@ -1,6 +1,8 @@
 package com.tradelog.app.data.remote
 
 import android.util.Log
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseAuth
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,13 +19,23 @@ object RetrofitClient {
 
     const val BASE_URL = "https://tradelog-api-17ra.onrender.com/"
 
-    // Auth token — set after Firebase sign-in (FR-02). Injected into every request header.
+    // Kept for backwards-compatibility — interceptor now fetches the token dynamically
+    @Suppress("unused")
     var authToken: String? = null
 
-    // Auth interceptor: attaches Bearer token to all outgoing requests
+    // Auth interceptor: fetches Firebase ID token on the OkHttp background thread and attaches it
     private val authInterceptor = Interceptor { chain ->
         val original = chain.request()
-        val token = authToken
+        val user = FirebaseAuth.getInstance().currentUser
+        val token = if (user != null) {
+            try {
+                Tasks.await(user.getIdToken(false)).token
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to get Firebase ID token: ${e.message}")
+                null
+            }
+        } else null
+
         val request = if (token != null) {
             original.newBuilder()
                 .header("Authorization", "Bearer $token")

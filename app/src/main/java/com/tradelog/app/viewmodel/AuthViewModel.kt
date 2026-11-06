@@ -9,12 +9,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.auth.FirebaseAuth
 import com.tradelog.app.data.model.User
+import com.tradelog.app.data.remote.RetrofitClient
 import com.tradelog.app.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 // AuthViewModel manages authentication state and drives the Login / Register screens.
 // Uses Android Credential Manager for Google Sign-In (FR-01, FR-02).
@@ -76,7 +79,11 @@ class AuthViewModel(
                 Log.d(TAG, "Google ID token received — signing in with Firebase")
                 val authResult = authRepository.signInWithGoogleIdToken(googleIdToken)
                 _authState.value = if (authResult.isSuccess) {
-                    Log.i(TAG, "Firebase authentication successful")
+                    Log.i(TAG, "Firebase authentication successful — fetching ID token for API")
+                    val idToken = FirebaseAuth.getInstance().currentUser
+                        ?.getIdToken(false)?.await()?.token
+                    RetrofitClient.authToken = idToken
+                    Log.d(TAG, "API auth token set: ${if (idToken != null) "ok" else "null"}")
                     AuthState.Success(authResult.getOrThrow())
                 } else {
                     val msg = authResult.exceptionOrNull()?.message ?: "Sign-in failed"
