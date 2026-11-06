@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import com.tradelog.app.data.remote.TradeRequest
 import com.tradelog.app.ui.theme.Purple
 import com.tradelog.app.viewmodel.TradeViewModel
@@ -41,6 +43,7 @@ fun TradeEntryScreen(
     var takeProfit by remember { mutableStateOf("") }
     var exitPrice by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
+    var pnlInput by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
     var tagsInput by remember { mutableStateOf("") }
 
@@ -57,6 +60,8 @@ fun TradeEntryScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .imePadding()
+            .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
     ) {
         // Header
@@ -115,6 +120,8 @@ fun TradeEntryScreen(
 
             PriceField("Position Size / Qty", quantity, qtyError, Modifier.fillMaxWidth()) { quantity = it; qtyError = null }
 
+            PriceField("P&L ($) (opt.)", pnlInput, null, Modifier.fillMaxWidth()) { pnlInput = it }
+
             // Strategy tags
             OutlinedTextField(
                 value = tagsInput,
@@ -162,6 +169,7 @@ fun TradeEntryScreen(
                             takeProfit = tp!!,
                             exitPrice = exitPrice.toDoubleOrNull(),
                             quantity = qty!!,
+                            pnl = pnlInput.toDoubleOrNull(),
                             notes = notes.ifBlank { null },
                             tags = tags,
                             entryTime = now,

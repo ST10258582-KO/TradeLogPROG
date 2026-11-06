@@ -54,7 +54,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
 // POST /trades
 router.post('/', async (req: AuthRequest, res: Response) => {
   try {
-    const { instrument, direction, entryPrice, stopLoss, takeProfit, exitPrice, quantity, notes, tags, entryTime, exitTime } = req.body;
+    const { instrument, direction, entryPrice, stopLoss, takeProfit, exitPrice, quantity, pnl: manualPnl, notes, tags, entryTime, exitTime } = req.body;
     const entry = new Date(entryTime);
     const exit = exitPrice ?? null;
     const trade = await prisma.trade.create({
@@ -68,7 +68,7 @@ router.post('/', async (req: AuthRequest, res: Response) => {
         exitPrice: exit,
         quantity,
         rMultiple: calcRMultiple(direction, entryPrice, stopLoss, exit),
-        pnl: calcPnl(direction, entryPrice, exit, quantity),
+        pnl: manualPnl ?? calcPnl(direction, entryPrice, exit, quantity),
         session: classifySession(entry),
         status: exit !== null ? 'CLOSED' : 'OPEN',
         notes: notes ?? null,

@@ -35,6 +35,7 @@ data class TradeRequest(
     val takeProfit: Double,
     val exitPrice: Double?,
     val quantity: Double,
+    val pnl: Double?,
     val notes: String?,
     val tags: List<String>,
     val entryTime: String,       // ISO-8601
