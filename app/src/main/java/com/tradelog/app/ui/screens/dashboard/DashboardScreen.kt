@@ -92,13 +92,13 @@ fun DashboardScreen(
             }
         }
         item {
-            Text("TradeLog", style = MaterialTheme.typography.headlineMedium, color = Color.White)
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, color = Color.White)
         }
         item { SummaryRow(winRate = winRate, netPnl = netPnl, avgR = avgR) }
         item { EquityCurveCard(points = equityCurve) }
         item {
             Text(
-                "Recent Trades",
+                stringResource(R.string.recent_trades),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -128,9 +128,9 @@ fun DashboardScreen(
 @Composable
 private fun SummaryRow(winRate: Double?, netPnl: Double?, avgR: Double?) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        StatCard("WIN RATE", winRate?.let { "${(it * 100).toInt()}%" } ?: "--", modifier = Modifier.weight(1f))
+        StatCard(stringResource(R.string.win_rate).uppercase(), winRate?.let { "${(it * 100).toInt()}%" } ?: "--", modifier = Modifier.weight(1f))
         StatCard(
-            "NET P&L",
+            stringResource(R.string.net_pnl).uppercase(),
             netPnl?.let { formatPnl(it) } ?: "--",
             valueColor = when {
                 netPnl == null -> Color.White
@@ -139,7 +139,7 @@ private fun SummaryRow(winRate: Double?, netPnl: Double?, avgR: Double?) {
             },
             modifier = Modifier.weight(1f)
         )
-        StatCard("AVG R", avgR?.let { String.format("%.2fR", it) } ?: "--", modifier = Modifier.weight(1f))
+        StatCard(stringResource(R.string.avg_r).uppercase(), avgR?.let { String.format("%.2fR", it) } ?: "--", modifier = Modifier.weight(1f))
     }
 }
 
@@ -168,11 +168,11 @@ private fun EquityCurveCard(points: List<EquityCurvePoint>) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Equity Curve", style = MaterialTheme.typography.titleMedium, color = Color.White)
+            Text(stringResource(R.string.equity_curve), style = MaterialTheme.typography.titleMedium, color = Color.White)
             Spacer(Modifier.height(12.dp))
             if (points.isEmpty()) {
                 Box(Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.Center) {
-                    Text("No data yet", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.loading), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 }
             } else {
                 Canvas(modifier = Modifier.fillMaxWidth().height(120.dp)) {

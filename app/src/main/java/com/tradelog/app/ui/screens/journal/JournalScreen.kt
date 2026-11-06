@@ -15,9 +15,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tradelog.app.R
 import com.tradelog.app.data.model.JournalEntry
 import com.tradelog.app.ui.theme.NeonGreen
 import com.tradelog.app.ui.theme.Purple
@@ -57,7 +59,7 @@ fun JournalScreen(journalViewModel: JournalViewModel = viewModel()) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             item {
-                Text("Journal", style = MaterialTheme.typography.headlineMedium, color = Color.White)
+                Text(stringResource(R.string.journal_title), style = MaterialTheme.typography.headlineMedium, color = Color.White)
             }
 
             if (showNewEntry) {
@@ -192,14 +194,14 @@ private fun EntryCard(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
                 Button(
                     onClick = { onSave(notes, completed, checklistItems.size) },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Purple)
                 ) {
-                    Text("Save Entry", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.save_entry), fontWeight = FontWeight.SemiBold)
                 }
             }
         }

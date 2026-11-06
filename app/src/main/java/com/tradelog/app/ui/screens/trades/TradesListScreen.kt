@@ -16,8 +16,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.tradelog.app.R
 import com.tradelog.app.data.model.Trade
 import com.tradelog.app.data.model.TradeDirection
 import com.tradelog.app.ui.theme.LossRed
@@ -67,7 +69,7 @@ fun TradesListScreen(
         ) {
             Spacer(Modifier.height(16.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("My Trades", style = MaterialTheme.typography.headlineMedium, color = Color.White, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.trades_title), style = MaterialTheme.typography.headlineMedium, color = Color.White, modifier = Modifier.weight(1f))
                 Icon(Icons.Default.FilterList, contentDescription = "Filter", tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Spacer(Modifier.height(12.dp))

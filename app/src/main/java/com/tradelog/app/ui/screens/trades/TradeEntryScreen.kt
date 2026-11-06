@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import com.tradelog.app.R
 import com.tradelog.app.data.remote.TradeRequest
 import com.tradelog.app.ui.theme.Purple
 import com.tradelog.app.viewmodel.SettingsViewModel
@@ -152,11 +154,11 @@ fun TradeEntryScreen(
 
             // Price fields
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PriceField("Entry Price", entryPrice, entryError, Modifier.weight(1f)) { entryPrice = it; entryError = null }
-                PriceField("Stop Loss", stopLoss, slError, Modifier.weight(1f)) { stopLoss = it; slError = null }
+                PriceField(stringResource(R.string.entry_price), entryPrice, entryError, Modifier.weight(1f)) { entryPrice = it; entryError = null }
+                PriceField(stringResource(R.string.stop_loss), stopLoss, slError, Modifier.weight(1f)) { stopLoss = it; slError = null }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PriceField("Take Profit", takeProfit, tpError, Modifier.weight(1f)) { takeProfit = it; tpError = null }
+                PriceField(stringResource(R.string.take_profit), takeProfit, tpError, Modifier.weight(1f)) { takeProfit = it; tpError = null }
                 PriceField("Exit Price (opt.)", exitPrice, null, Modifier.weight(1f)) { exitPrice = it }
             }
 
@@ -201,7 +203,7 @@ fun TradeEntryScreen(
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Notes") },
+                label = { Text(stringResource(R.string.notes)) },
                 modifier = Modifier.fillMaxWidth().height(100.dp),
                 maxLines = 4,
                 colors = outlinedColors()
@@ -255,7 +257,7 @@ fun TradeEntryScreen(
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
                 } else {
-                    Text(if (isEditing) "SAVE CHANGES" else "LOG TRADE", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(if (isEditing) stringResource(R.string.save_changes).uppercase() else stringResource(R.string.add_trade).uppercase(), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
         }

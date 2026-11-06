@@ -63,7 +63,7 @@ fun SettingsScreen(
             .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Settings", style = MaterialTheme.typography.headlineMedium, color = Color.White)
+        Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineMedium, color = Color.White)
 
         // User profile card
         Card(
@@ -96,13 +96,13 @@ fun SettingsScreen(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                SettingsTextField("Display Name", displayName) { displayName = it; saved = false }
-                SettingsTextField("Timezone", timezone) { timezone = it; saved = false }
-                SettingsTextField("Default Risk %", defaultRisk) { defaultRisk = it; saved = false }
-                SettingsTextField("Currency", currency) { currency = it; saved = false }
+                SettingsTextField(stringResource(R.string.display_name), displayName) { displayName = it; saved = false }
+                SettingsTextField(stringResource(R.string.timezone), timezone) { timezone = it; saved = false }
+                SettingsTextField(stringResource(R.string.default_risk), defaultRisk) { defaultRisk = it; saved = false }
+                SettingsTextField(stringResource(R.string.currency), currency) { currency = it; saved = false }
 
                 // Language selector (FR-03 — English, Afrikaans, Zulu)
-                Text("Language", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.language_label), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf("en" to "English", "af" to "Afrikaans", "zu" to "Zulu").forEach { (code, label) ->
                         FilterChip(
@@ -119,7 +119,7 @@ fun SettingsScreen(
 
                 // Notifications toggle
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text("Notifications", style = MaterialTheme.typography.bodyLarge, color = Color.White, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.notifications_label), style = MaterialTheme.typography.bodyLarge, color = Color.White, modifier = Modifier.weight(1f))
                     Switch(
                         checked = notifications,
                         onCheckedChange = { notifications = it; saved = false },
@@ -179,7 +179,7 @@ fun SettingsScreen(
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = if (saved) MaterialTheme.colorScheme.surfaceVariant else Purple)
         ) {
-            Text(if (saved) "Saved" else "Save Changes", fontWeight = FontWeight.SemiBold)
+            Text(if (saved) stringResource(R.string.saved) else stringResource(R.string.save_changes), fontWeight = FontWeight.SemiBold)
         }
 
         // Risk Calculator — navigate to position sizing tool
@@ -205,7 +205,7 @@ fun SettingsScreen(
             colors = ButtonDefaults.outlinedButtonColors(contentColor = LossRed),
             border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(LossRed))
         ) {
-            Text("Sign Out", color = LossRed, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.sign_out), color = LossRed, fontWeight = FontWeight.SemiBold)
         }
     }
 }
