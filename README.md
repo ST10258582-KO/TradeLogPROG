@@ -261,3 +261,5 @@ Generative AI (Claude by Anthropic) was used as a code-generation and debugging 
 All AI-generated code is cited inline with comments referencing the source (e.g., "Reference: Google LLC, 'Room Persistence Library' Android Developers (2024)"). The core business logic, architecture decisions, and UI design were created by the student.
 
 *Word count: ~220 words*
+
+<!-- v2.0 final -->
