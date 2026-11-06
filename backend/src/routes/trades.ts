@@ -54,7 +54,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
 // POST /trades
 router.post('/', async (req: AuthRequest, res: Response) => {
   try {
-    const { instrument, direction, entryPrice, stopLoss, takeProfit, exitPrice, quantity, pnl: manualPnl, notes, tags, entryTime, exitTime } = req.body;
+    const { instrument, direction, entryPrice, stopLoss, takeProfit, exitPrice, quantity, pnl: manualPnl, notes, tags, entryTime, exitTime, session: sessionOverride } = req.body;
     const entry = new Date(entryTime);
     const exit = exitPrice ?? null;
     const trade = await prisma.trade.create({
@@ -69,7 +69,7 @@ router.post('/', async (req: AuthRequest, res: Response) => {
         quantity,
         rMultiple: calcRMultiple(direction, entryPrice, stopLoss, exit),
         pnl: manualPnl ?? calcPnl(direction, entryPrice, exit, quantity),
-        session: classifySession(entry),
+        session: sessionOverride ?? classifySession(entry),
         status: exit !== null ? 'CLOSED' : 'OPEN',
         notes: notes ?? null,
         tags: Array.isArray(tags) ? tags.join(',') : (tags ?? ''),
@@ -101,7 +101,8 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const existing = await prisma.trade.findFirst({ where: { id: req.params.id, userId: req.uid! } });
     if (!existing) { res.status(404).json({ error: 'Trade not found' }); return; }
-    const { instrument, direction, entryPrice, stopLoss, takeProfit, exitPrice, quantity, notes, tags, entryTime, exitTime } = req.body;
+    const { instrument, direction, entryPrice, stopLoss, takeProfit, exitPrice, quantity, pnl: manualPnl, notes, tags, entryTime, exitTime, session: sessionOverride } = req.body;
+    const entry = new Date(entryTime);
     const exit = exitPrice ?? null;
     const trade = await prisma.trade.update({
       where: { id: req.params.id },
@@ -109,9 +110,10 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
         instrument, direction, entryPrice, stopLoss, takeProfit,
         exitPrice: exit, quantity, notes, tags,
         rMultiple: calcRMultiple(direction, entryPrice, stopLoss, exit),
-        pnl: calcPnl(direction, entryPrice, exit, quantity),
+        pnl: manualPnl ?? calcPnl(direction, entryPrice, exit, quantity),
+        session: sessionOverride ?? classifySession(entry),
         status: exit !== null ? 'CLOSED' : 'OPEN',
-        entryTime: new Date(entryTime),
+        entryTime: entry,
         exitTime: exitTime ? new Date(exitTime) : null,
         syncedAt: new Date()
       }
